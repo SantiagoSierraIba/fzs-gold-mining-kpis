@@ -100,7 +100,7 @@ We also checked many other signals: gold and mercury trade, coca,
 malaria in Brazil, aviation fuel, dredges in Colombia and Loreto, and
 traffic on the Interoceanic Highway. They are useful **context**, but
 each one has a problem that stops it from being a yearly indicator for
-FZS (Section 8).
+FZS (Section 9).
 
 **How to read the labels.** Every claim is marked **[Description]**
 (what the data show), **[Prediction]** (what may happen) or
@@ -111,7 +111,7 @@ FZS (Section 8).
 1. **We started from FZS's problem.** The yearly maps are good but
    late. So we looked for numbers that move earlier, and for numbers
    that say *where* the mining is.
-2. **We described Madre de Dios first** (Section 3). The maps give a
+2. **We described Madre de Dios first** (Section 4). The maps give a
    *stock* (all mining land in a year). The stock rarely goes down, so
    we used *flows*: land that became mining each year, and where it came
    from.
@@ -527,9 +527,16 @@ and `r fmt(f(2023,"from_forest"))` ha in 2021, 2022 and 2023.
 the map then calls them water. If miners come back, or if the map
 changes its mind, the same land is called mining again. Mining can also
 move into river channels. The map cannot tell these stories apart
-**[Interpretation, not tested]**. **So what did we decide?** Our yearly
-indicator (KPI 4) counts only **forest that became mining**, not the net
-addition.
+**[Interpretation, not tested]**. We think the way the map is made
+explains a large part of it, for two reasons. First, studies in Madre de
+Dios show that satellite methods find mining ponds hard to classify: the
+water in active ponds is muddy, and ponds change colour as they age
+(Caballero Espejo et al. 2018; Camalan et al. 2022). Second, water to
+mining also jumped in the rest of Peru in 2023 (Section 10), and miners
+going back to old pits in Madre de Dios cannot explain that. **So what
+did we decide?** Our yearly indicator (KPI 4) counts only **forest that
+became mining**, not the net addition. Trees turning into bare ground
+are much easier to see from space than a pond turning into mining.
 
 ```{r fig-flows, fig.height = 4.5}
 flows %>% filter(year >= 2010) %>%
@@ -1244,7 +1251,7 @@ a copy every quarter.
 **Why.** This is the trusted yearly number for donors. It comes from
 MapBiomas Peru, which maps all of Peru every year since 1985. We count
 only **forest that became mining**, for the reason explained in Section
-3. We show two lines:
+4. We show two lines:
 
 - **Inside reserves and buffer zones**: four FZS landscapes (Tambopata,
   Amarakaeri, Bahuaja-Sonene and Manu), inside the reserves and in their
@@ -1332,7 +1339,7 @@ mining corridor: `r pub("maap208_cn")`% in native communities and
 **What it does not show.** Mining in rivers, mining again on old sites,
 mercury. It arrives late: each year's map is published 5 to 17 months
 after the year ends. MapBiomas also revises earlier years in each new
-version (Section 9).
+version (Section 10).
 
 ## KPI 5 (now, quarterly): is mining spreading outside Madre de Dios?
 
