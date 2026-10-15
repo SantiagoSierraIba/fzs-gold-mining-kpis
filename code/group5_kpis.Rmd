@@ -1535,8 +1535,8 @@ was red from `r format(k1_first, "%B %Y")`, and KPI 2 from
    (`r sprintf("%+.0f", 100*(c4_mdd_2022/pub("c2_mdd_2022")-1))`%). So
    the backtest shows timing, not the exact values FZS would have seen.
 3. **The early KPIs also give warnings with no surge after them**
-   (KPI 2 in 2017 and 2018). An early signal means "get ready", not
-   "mining will rise".
+   (KPI 2 in 2017 and 2018). An early signal shows pressure building; it
+   is not a forecast that mining will rise.
 
 # Main figure for the brief
 
