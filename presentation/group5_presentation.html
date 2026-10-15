@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Watching the Gold</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5,21 +6,13 @@
 <style>
 /* Layout: a 16:9 stage (1600x900) scaled to the window; one slide at a time, like a field report read over a river map at night. */
 :root {
-  --bg: #EEF0EA; --panel: #FFFFFF; --line: #CDD5CB; --fg: #13211C; --muted: #56665E;
-  --gold: #A77700; --forest: #2F6B4C; --water: #3A7EA3; --silt: #9A6638;
-  --red: #C2341F; --ok: #2E8A5B; --band: rgba(167,119,0,.10);
+  --bg: #0C1613; --panel: rgba(19,34,29,.88); --line: #2A3F38; --fg: #ECE6D8; --muted: #A9B4AB;
+  --gold: #E3B43E; --forest: #6FB08A; --water: #6FA9C9; --silt: #C38D5C;
+  --red: #F0604A; --ok: #7CC49A; --band: rgba(227,180,62,.09); color-scheme: dark;
   --display: "Big Shoulders Display", "Oswald", "Arial Narrow", sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0C1613; --panel: #13221D; --line: #2A3F38; --fg: #ECE6D8; --muted: #A3AFA6;
-  --gold: #E3B43E; --forest: #6FB08A; --water: #6FA9C9; --silt: #C38D5C;
-  --red: #F0604A; --ok: #7CC49A; --band: rgba(227,180,62,.09); color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #0C1613; --panel: #13221D; --line: #2A3F38; --fg: #ECE6D8; --muted: #A3AFA6;
-  --gold: #E3B43E; --forest: #6FB08A; --water: #6FA9C9; --silt: #C38D5C;
-  --red: #F0604A; --ok: #7CC49A; --band: rgba(227,180,62,.09); color-scheme: dark }
 
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); overflow: hidden; }
@@ -52,6 +45,18 @@ svg text { font-family: var(--mono); fill: var(--muted); }
 svg .axis { stroke: var(--line); stroke-width: 1.5; }
 svg .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 6; }
 
+/* satellite background: the same place, one Sentinel-2 image per year, fading as slides advance */
+.sat { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.sat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.05); transition: opacity 1.6s ease, transform 9s cubic-bezier(.22,1,.36,1); }
+.sat img.on { opacity: 1; transform: scale(1); }
+.veil { position: absolute; inset: 0; z-index: 0; background: linear-gradient(90deg, rgba(8,16,13,.86) 0%, rgba(8,16,13,.7) 45%, rgba(8,16,13,.3) 100%), linear-gradient(180deg, rgba(8,16,13,.35) 0%, rgba(8,16,13,0) 30%, rgba(8,16,13,0) 75%, rgba(8,16,13,.45) 100%); }
+.slide { text-shadow: 0 2px 14px rgba(0,0,0,.55); }
+.fig, .panel { text-shadow: none; }
+.slide { z-index: 1; }
+.sat-tag { position: absolute; right: 96px; top: 34px; z-index: 2; font-family: var(--mono); font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: baseline; gap: 12px; }
+.sat-tag b { font-family: var(--display); font-size: 34px; font-weight: 800; color: var(--gold); letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) { .sat img { transition: opacity .6s ease; transform: none; } }
+body.capture .sat img { transition: none; transform: none; }
 /* slide 1 */
 .title-meta { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
 .names { font-size: 24px; line-height: 1.6; color: var(--muted); }
@@ -61,7 +66,8 @@ svg .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 6; }
 .river path.thin { stroke-width: 1.5; opacity: .3; }
 
 /* facts */
-.fact { display: grid; grid-template-columns: 380px 1fr; gap: 36px; align-items: center; }
+.fact { display: grid; grid-template-columns: 380px 1fr; gap: 36px; align-items: center; padding-block: 22px; }
+.fact + .fact { border-top: 1px solid var(--line); }
 .fact .num { font-size: 168px; color: var(--gold); white-space: nowrap; }
 .fact p { font-size: 34px; line-height: 1.3; }
 .fact .small { margin-top: 10px; }
@@ -97,7 +103,7 @@ svg .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 6; }
 /* figures from the replication notebook (white paper card in both themes) */
 .fig { margin: 0; background: #FFFFFF; border-radius: 12px; padding: 12px; min-width: 0; }
 .fig img { display: block; width: 100%; height: auto; }
-.facts3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-block: 64px; }
+.facts3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-block: 64px; align-items: end; }
 .facts3 .num { font-size: 116px; display: block; }
 .facts3 p { font-size: 30px; color: var(--muted); margin-top: 10px; }
 body.capture .bar, body.capture .ctrl, body.capture .notes-panel { display: none !important; }
@@ -164,24 +170,35 @@ body.capture .viewport { padding: 0; }
 </style>
 
 <div class="viewport"><div class="stage" id="stage">
+<div class="sat" aria-hidden="true">
+  <img data-year="2016" alt="" src="sat/bg_2016.jpg">
+  <img data-year="2018" alt="" src="sat/bg_2018.jpg">
+  <img data-year="2019" alt="" src="sat/bg_2019.jpg">
+  <img data-year="2020" alt="" src="sat/bg_2020.jpg">
+  <img data-year="2021" alt="" src="sat/bg_2021.jpg">
+  <img data-year="2022" alt="" src="sat/bg_2022.jpg">
+  <img data-year="2023" alt="" src="sat/bg_2023.jpg">
+  <img data-year="2024" alt="" src="sat/bg_2024.jpg">
+  <img data-year="2025" alt="" src="sat/bg_2025.jpg">
+</div>
+<div class="veil" aria-hidden="true"></div>
+<div class="sat-tag" aria-hidden="true">Same place, from space <b id="satYear">2016</b></div>
+
 
 <!-- 1 -->
-<section class="slide active" data-time="0:20">
-  <svg class="river" viewBox="0 0 760 900" aria-hidden="true">
-    <path d="M520 -20 C 380 120, 700 210, 560 340 S 300 470, 470 600 S 720 760, 560 930"/>
-    <path class="thin" d="M600 -20 C 470 110, 760 230, 640 350 S 380 480, 540 610 S 790 770, 640 930"/>
-  </svg>
-  <div class="eyebrow">ESMT · Data for Good · Question 5 · Frankfurt Zoological Society</div>
+<section data-year="2016" class="slide active" data-time="0:20">
+  <div class="eyebrow">ESMT · Data for Good · Frankfurt Zoological Society</div>
   <h1>What should FZS<br>track every year?</h1>
-  <p class="lead">Five numbers to see illegal gold mining in Peru earlier, and to act where it matters.</p>
+  <p class="lead">Five numbers to see illegal gold mining in the Amazon earlier, starting with Peru, and to act where it matters.</p>
   <div class="title-meta">
     <div class="names"><b>Group 5 · Giant River Turtle</b> · October 2026<br>Likitha Yenuga · Laura Pérez · Pietro Maran · Erion Vathi · Santiago Sierra</div>
   </div>
+  <p class="src">Background: one place near the Madre de Dios river, outside protected areas, seen by satellite each year from 2016 to 2025. Sentinel 2 cloudless by EOX IT Services (contains modified Copernicus Sentinel data).</p>
   <div class="notes">Hello. We are group 5, the Giant River Turtle. Our question: what should FZS track every year about illegal gold mining. We start with our animal.</div>
 </section>
 
 <!-- 2 -->
-<section class="slide" data-time="0:35">
+<section data-year="2016" class="slide" data-time="0:35">
   <div class="eyebrow">Before we start · our animal</div>
   <h2>Two facts about the giant river turtle</h2>
   <div class="fact"><div class="num">73 kg</div><div><p>The biggest river turtle in South America. The record female weighed 73 kg, about as much as an adult person.</p></div></div>
@@ -192,7 +209,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 3 -->
-<section class="slide" data-time="0:40">
+<section data-year="2018" class="slide" data-time="0:40">
   <div class="eyebrow">The problem</div>
   <h2>FZS learns about new mining more than a year late</h2>
   <div class="facts3">
@@ -206,7 +223,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 4 -->
-<section class="slide" data-time="1:00">
+<section data-year="2019" class="slide" data-time="1:00">
   <div class="eyebrow">What the data showed first · Madre de Dios</div>
   <h2>The 2023 jump was partly old ponds, not new forest loss</h2>
   <div class="row">
@@ -223,7 +240,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 5 -->
-<section class="slide" data-time="0:40">
+<section data-year="2020" class="slide" data-time="0:40">
   <div class="eyebrow">How we chose the KPIs</div>
   <h2>Three speeds, five tests</h2>
   <div class="speeds">
@@ -237,7 +254,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 6 -->
-<section class="slide" data-time="0:40">
+<section data-year="2021" class="slide" data-time="0:40">
   <div class="eyebrow">How we set the thresholds</div>
   <h2>One simple red line for each KPI</h2>
   <div class="rules">
@@ -253,7 +270,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 7 -->
-<section class="slide" data-time="0:40">
+<section data-year="2022" class="slide" data-time="0:40">
   <div class="eyebrow">Our answer</div>
   <h2>Five KPIs for FZS</h2>
   <div class="kpis">
@@ -267,7 +284,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 8 -->
-<section class="slide" data-time="1:00">
+<section data-year="2023" class="slide" data-time="1:00">
   <div class="eyebrow">KPI 1 and KPI 2 · early</div>
   <h2>Gold tells FZS to get ready</h2>
   <div class="row">
@@ -282,7 +299,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 9 -->
-<section class="slide" data-time="1:05">
+<section data-year="2024" class="slide" data-time="1:05">
   <div class="eyebrow">KPI 3 · now · Tambopata National Reserve</div>
   <h2>Mining is moving into the Tambopata reserve</h2>
   <div class="row">
@@ -305,7 +322,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 10 -->
-<section class="slide" data-time="0:35">
+<section data-year="2024" class="slide" data-time="0:35">
   <div class="eyebrow">KPI 4 · late · MapBiomas yearly map</div>
   <h2>The yearly map confirms it inside FZS areas</h2>
   <div class="row" style="gap:48px;align-items:center">
@@ -322,7 +339,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 11 -->
-<section class="slide" data-time="0:30">
+<section data-year="2025" class="slide" data-time="0:30">
   <div class="eyebrow">KPI 5 · now · Amazon Mining Watch</div>
   <h2>Mining is spreading outside Madre de Dios</h2>
   <div class="row" style="gap:48px;align-items:center">
@@ -341,7 +358,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 11 -->
-<section class="slide" data-time="0:45">
+<section data-year="2025" class="slide" data-time="0:45">
   <div class="eyebrow">Would it have warned in time?</div>
   <h2>Early signals came two years before the maps</h2>
   <div class="row" style="gap:56px;align-items:center">
@@ -360,7 +377,7 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 12 -->
-<section class="slide" data-time="0:25">
+<section data-year="2025" class="slide" data-time="0:25">
   <div class="eyebrow">Context, not KPIs</div>
   <h2>Other traces of illegal gold</h2>
   <div class="ctx">
@@ -376,22 +393,20 @@ body.capture .viewport { padding: 0; }
 </section>
 
 <!-- 13 -->
-<section class="slide" data-time="0:25">
+<section data-year="2025" class="slide" data-time="0:25">
   <div class="eyebrow">Ideas we did not have time to test</div>
   <h2>What FZS could add next</h2>
   <div class="ideas">
     <div class="idea"><div class="i">A</div><div><h3>Count turtle nests on river beaches</h3><p>Nesting beaches lost near mining. Our animal could become an indicator.</p></div></div>
-    <div class="idea"><div class="i">B</div><div><h3>Measure mercury every year</h3><p>In fish, turtles and people downstream of mining.</p></div></div>
-    <div class="idea"><div class="i">C</div><div><h3>Use radar satellites</h3><p>They see through clouds, so the rainy months are not blind. SERNANP already runs one (RAMI).</p></div></div>
-    <div class="idea"><div class="i">D</div><div><h3>Use FZS's own field reports</h3><p>Ranger patrols and dredge counts on Madre de Dios rivers.</p></div></div>
-    <div class="idea"><div class="i">E</div><div><h3>Check satellites against the ground</h3><p>SERNANP's records of illegal mining sites as a test set.</p></div></div>
-    <div class="idea"><div class="i">F</div><div><h3>Save every data version</h3><p>Amazon Mining Watch changes its data. Keep a copy every quarter.</p></div></div>
+    <div class="idea"><div class="i">B</div><div><h3>Use radar satellites</h3><p>They see through clouds, so the rainy months are not blind. SERNANP already runs one (RAMI).</p></div></div>
+    <div class="idea"><div class="i">C</div><div><h3>Use FZS's own field reports</h3><p>Ranger patrols and dredge counts on Madre de Dios rivers.</p></div></div>
+    <div class="idea"><div class="i">D</div><div><h3>Watch El Niño and drought</h3><p>El Niño years bring drought. Low rivers open more beaches and banks, so mining is easier. Erion's first test is not conclusive yet.</p></div></div>
   </div>
-  <div class="notes">Ideas we did not test, but that could help FZS. The first one closes the circle: count turtle nests on river beaches near mining. Others: mercury sampling, radar for the cloudy months, FZS's own field reports, ground checks with SERNANP records, and saving every version of the satellite data.</div>
+  <div class="notes">Ideas we did not test, but that could help FZS. First, count turtle nests on river beaches near mining: our animal could become an indicator. Second, radar satellites for the cloudy months. Third, FZS's own field reports. And Erion's idea: El Niño years bring drought, low rivers open more beaches, so mining may be easier. His first test is not conclusive, so it needs more data.</div>
 </section>
 
 <!-- 14 -->
-<section class="slide" data-time="0:40">
+<section data-year="2025" class="slide" data-time="0:40">
   <div class="eyebrow">To take away</div>
   <h2>Watch early, act where it matters, confirm late</h2>
   <div class="take">
@@ -432,6 +447,9 @@ body.capture .viewport { padding: 0; }
   function show(i) {
     cur = Math.max(0, Math.min(slides.length - 1, i));
     slides.forEach(function (s, k) { s.classList.toggle('active', k === cur); });
+    var yr = slides[cur].getAttribute('data-year');
+    [].forEach.call(document.querySelectorAll('.sat img'), function (im) { im.classList.toggle('on', im.getAttribute('data-year') === yr); });
+    document.getElementById('satYear').textContent = yr;
     document.getElementById('count').textContent = (cur + 1) + ' / ' + slides.length;
     document.getElementById('prog').style.width = ((cur + 1) / slides.length * 100) + '%';
     var n = slides[cur].querySelector('.notes');
