@@ -1458,8 +1458,8 @@ would each KPI have warned FZS about the 2021 to 2023 surge? We use the
 dates when each source was first published. MapBiomas Peru presented
 Collection 1 (maps to 2021) on 3 March 2023 (reported by Panamericana
 that day), Collection 2 (to 2022) on 15 February 2024 (MapBiomas Peru's
-website), Collection 3 (to 2024) by 12 June 2025 at the latest (reported
-by Mongabay; MapBiomas press material gives 5 June), and Collection 4
+website), Collection 3 (to 2024) on 5 June 2025 (MapBiomas Peru's
+website; Mongabay reported it on 12 June), and Collection 4
 (to 2025) on 20 August 2026 (Caretas). MAAP published
 `r fmt(pub("maap185_2122"))` ha for 2021 and 2022 on 15 June 2023
 (#185), and `r fmt(pub("maap208_2123"))` ha for 2021 to 2023 on 8 May
@@ -1468,12 +1468,12 @@ by Mongabay; MapBiomas press material gives 5 June), and Collection 4
 ```{r backtest}
 release <- tribble(~covers_to, ~release_date,
                    2021, as.Date("2023-03-03"), 2022, as.Date("2024-02-15"),
-                   2024, as.Date("2025-06-12"), 2025, as.Date("2026-08-20"))   # C3: latest verified date
+                   2024, as.Date("2025-06-05"), 2025, as.Date("2026-08-20"))   # dates of each collection's presentation
 first_release <- function(y) min(release$release_date[release$covers_to >= y])
 k1_first <- first_signals$date[first_signals$date >= as.Date("2019-01-01")][1]
 k2_first <- episodes$from[episodes$from >= as.Date("2019-01-01")][1]
 k4_first <- function(z) { y <- k4$year[k4$zone == z & k4$red %in% TRUE & k4$year %in% 2019:2025]; if (length(y)) y else NA }
-delay_months <- sapply(2021:2023, function(y) as.numeric(first_release(y) - as.Date(paste0(y, "-12-31"))) / 30.44)
+delay_months <- sapply(2021:2025, function(y) as.numeric(first_release(y) - as.Date(paste0(y, "-12-31"))) / 30.44)
 net_cc <- flows %>% filter(year >= 2005) %>% arrange(year) %>%
   mutate(limit = rollapplyr(lag(net_addition), 5, mean, fill = NA) + 2 * rollapplyr(lag(net_addition), 5, sd, fill = NA),
          red = net_addition > limit)
@@ -1489,7 +1489,7 @@ bt <- tribble(
   "3 New mining in FZS landscapes (quarterly)", first_reserve_red, "days after the quarter",
      "Quarterly data start in 2025, so this KPI cannot be tested on the surge. The yearly detections did not rise in 2021 to 2023",
   "4 Forest that became mining, all Madre de Dios", paste(mdd_years, collapse = ", "), format(first_release(min(mdd_years)), "%d %b %Y"),
-     paste0("The surge years were first mapped ", round(min(delay_months)), " to ", round(max(delay_months)), " months after each year ended"),
+     paste0("Each year was first mapped ", round(min(delay_months)), " to ", round(max(delay_months)), " months after it ended (", paste(round(delay_months), collapse = ", "), " months for 2021 to 2025)"),
   "4 Forest that became mining, reserves / buffer zones", paste0(paste(res_years_red, collapse = ", "), " / ", paste(za_years_red, collapse = ", ")),
      format(first_release(min(c(res_years_red, za_years_red), na.rm = TRUE)), "%d %b %Y"), "Inside the reserves from 2023; buffer zones in 2025",
   "5 New mining outside Madre de Dios", "not red", "days after the quarter", "Quarterly data start in 2025; cannot be tested on the surge",
