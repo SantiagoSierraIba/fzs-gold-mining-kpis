@@ -1,0 +1,2041 @@
+---
+title: "What should FZS track every year? Five indicators for illegal gold mining"
+subtitle: "Data for Good · Group 5 (Giant River Turtle) · Question 5, Peru · Replication notebook"
+author: "Likitha Yenuga, Laura Pérez, Pietro Maran, Erion Vathi, Santiago Sierra"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: hide
+    df_print: kable
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include = FALSE}
+# Run this file from the code/ folder: rmarkdown::render("group5_kpis.Rmd")
+# Every path below is relative to the replication folder (one level up).
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 9, fig.height = 5.5, dpi = 150)
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
+```
+
+```{r packages}
+rm(list = ls())
+
+library(tidyverse)   # data handling and plots
+library(readxl)      # MapBiomas and World Bank workbooks
+library(jsonlite)    # BCRP and UN Comtrade files
+library(sf)          # maps: points in polygons
+library(terra)       # Amazon Mining Watch scar map (raster)
+library(patchwork)   # figures with several panels
+library(zoo)         # rolling means
+sf_use_s2(FALSE)
+
+RAW <- "data_raw"
+OUT <- "output"
+dir.create(OUT, showWarnings = FALSE)
+
+# Every number that appears in the brief is written to output/numbers_in_brief.csv
+numbers <- tibble(id = character(), description = character(), value = numeric(),
+                  unit = character(), source = character())
+log_number <- function(id, description, value, unit, source) {
+  numbers <<- bind_rows(numbers, tibble(id = id, description = description,
+                                        value = value, unit = unit, source = source))
+  invisible(value)
+}
+
+# Check against the publisher: stop if a number does not match
+check <- function(label, value, expected, tol = 1) {
+  ok <- abs(value - expected) < tol
+  cat(sprintf("%s %-72s %12s   (publisher: %s)\n", if (ok) "OK  " else "FAIL", label,
+              format(round(value, 1), big.mark = ","), format(round(expected, 1), big.mark = ",")))
+  if (!ok) stop(label, ": check failed")
+}
+
+fmt <- function(x, d = 0) format(round(x, d), big.mark = ",", nsmall = d)
+pct <- function(x) sprintf("%+d%%", round(x))
+
+theme_fzs <- theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = "bold", size = 12),
+        plot.caption = element_text(colour = "grey40", size = 8, hjust = 0),
+        legend.position = "bottom")
+theme_set(theme_fzs)
+col_main <- "#234A76"; col_alert <- "#C0392B"; col_soft <- "#F28E2B"; col_grey <- "#9AA5B1"
+```
+
+# Our answer
+
+FZS (Frankfurt Zoological Society) reports to donors and governments on
+illegal gold mining around its protected areas in Peru. Today it learns
+about new mining mainly from yearly satellite maps, and these maps arrive
+more than a year late. Our question was: **which numbers should FZS
+check every year, so it can see trouble earlier and act?**
+
+We recommend **five indicators**. They work at three speeds:
+
+- **Early** numbers move before new mining shows up on the maps.
+- **Now** numbers show where mining is happening this quarter.
+- **Late** numbers confirm, once a year, how much forest was lost. They
+  are slow but trusted, so FZS can use them in donor reports.
+
+| \# | Indicator | Speed | How often | Source |
+|----|-----------|-------|-----------|--------|
+| 1 | Gold price in soles, after inflation, compared with its average of the last 3 years | Early | Monthly | World Bank, Central Bank of Peru (BCRP) |
+| 2 | Peru's gold gap: gold exported minus gold declared as produced | Early | Monthly | BCRP |
+| 3 | New mining in FZS landscapes (hectares, by quarter) | Now | Quarterly | Amazon Mining Watch, SERNANP |
+| 4 | Forest turned into mining: inside reserves and buffer zones, and in all of Madre de Dios | Late | Yearly | MapBiomas Peru |
+| 5 | New mining outside Madre de Dios (is mining spreading?) | Now | Quarterly | Amazon Mining Watch |
+
+Each indicator has **one red line** (a simple rule) and **one action**
+for FZS. Section 6 explains how we chose each red line and whether it
+would have warned FZS in time before the 2021 to 2023 mining surge.
+
+We also checked many other signals: gold and mercury trade, coca,
+malaria in Brazil, aviation fuel, dredges in Colombia and Loreto, and
+traffic on the Interoceanic Highway. They are useful **context**, but
+each one has a problem that stops it from being a yearly indicator for
+FZS (Section 8).
+
+**How to read the labels.** Every claim is marked **[Description]**
+(what the data show), **[Prediction]** (what may happen) or
+**[Causal]** (what causes what). We make no causal claims.
+
+# How we worked
+
+1. **We started from FZS's problem.** The yearly maps are good but
+   late. So we looked for numbers that move earlier, and for numbers
+   that say *where* the mining is.
+2. **We described Madre de Dios first** (Section 3). The maps give a
+   *stock* (all mining land in a year). The stock rarely goes down, so
+   we used *flows*: land that became mining each year, and where it came
+   from.
+3. **We found a trap.** Much of the big 2023 jump was water (old
+   flooded pits and rivers) relabelled as mining, not new forest loss.
+   So our yearly indicator counts only **forest that became mining**.
+4. **We looked for early signals.** Miners respond to the gold price.
+   And gold that is exported but never declared as produced shows how
+   much gold comes from outside the legal system.
+5. **We used quarterly satellite data** to see where mining is
+   happening now, and in hectares, so the numbers can be compared with
+   other sources.
+6. **We checked if mining is spreading** to new places outside Madre de
+   Dios.
+7. **We set one red line for each indicator and tested it on the past.**
+   We chose the rules after we saw the data, so the test shows what
+   *would* have happened. It is not proof. The fair test is the next two
+   years.
+8. **We kept the other signals as context.** We say why each one is not
+   a main indicator.
+
+# Data and checks
+
+All raw files are in `data_raw/` exactly as downloaded. Each file has one
+row in `DOWNLOAD_LOG.csv`. Two Amazon Mining Watch files are too big for
+the zip (113 MB and 62 MB). They are kept in `../data_large/`, next to
+the replication folder, and the code below downloads them if they are
+missing. Amazon Mining Watch replaces these files when its model
+changes, so the checks below stop the notebook if a new download does
+not match the version we used.
+
+```{r download-large}
+large <- file.path("..", "data_large")
+dir.create(large, showWarnings = FALSE)
+amw_file  <- file.path(large, "amazon_basin_detections.geojson")
+scar_file <- file.path(large, "amazon_basin_mining_scar_masks.tif")
+options(timeout = 1200)
+if (!file.exists(amw_file))  download.file("https://data.source.coop/earthgenome/amazon-mining-watch/amazon_basin_detections.geojson", amw_file, mode = "wb")
+if (!file.exists(scar_file)) download.file("https://data.source.coop/earthgenome/amazon-mining-watch/amazon_basin_mining_scar_masks.tif", scar_file, mode = "wb")
+cat("MD5 of the detections file:", unname(tools::md5sum(amw_file)), "\n")
+cat("MD5 of the scar map:       ", unname(tools::md5sum(scar_file)), "\n")
+```
+
+```{r regional-downloads}
+REG <- file.path(RAW, "regional")
+dir.create(REG, showWarnings = FALSE)
+# Download a file only if it is missing (all files used here are already in data_raw/regional/)
+get_if_missing <- function(url, file, wait = 0) {
+  dest <- file.path(REG, file)
+  if (!file.exists(dest)) { Sys.sleep(wait); options(timeout = 600); download.file(url, dest, mode = "wb", quiet = TRUE) }
+  invisible(dest)
+}
+ct <- "https://comtradeapi.un.org/public/v1/preview/C/A/HS?"   # UN Comtrade public preview: one year per call, no key
+for (y in 2010:2025) {
+  get_if_missing(paste0(ct, "reporterCode=604,170,76,68,218,862,328,740&cmdCode=7108&flowCode=X&period=", y, "&partnerCode=0"), sprintf("comtrade_gold_exports_%d.json", y), 5)
+  get_if_missing(paste0(ct, "reporterCode=604,170,76,68,218,328,740,862,484&cmdCode=280540&flowCode=M,X&period=", y, "&partnerCode=0"), sprintf("comtrade_mercury_%d.json", y), 5)
+  if (y >= 2015) get_if_missing(paste0(ct, "reporterCode=604,170,76&cmdCode=842952&flowCode=M&period=", y, "&partnerCode=0"), sprintf("comtrade_excavators_%d.json", y), 5)
+}
+get_if_missing("https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN38792BM-RD12978DM/json/2010-1/2026-12", "bcrp_gold_exports_production.json")
+get_if_missing("https://ocean.bazg.admin.ch/open-data-reports/TN8_controlCode_Gold_IMP_en_v1/TN8_controlCode_Gold_IMP_en_v1.csv", "swiss_gold_imports_by_origin.csv")
+get_if_missing("https://www.datos.gov.co/resource/r85m-vv6c.csv?$where=recurso_natural%3D%27ORO%27&$limit=500000", "colombia_anm_gold_production.csv")
+get_if_missing("https://www.datos.gov.co/resource/dxs6-mdeg.csv?$limit=500000", "colombia_mindefensa_machinery_seized.csv")
+get_if_missing("https://www.datos.gov.co/resource/acs4-3wgp.csv?$limit=5000", "colombia_coca_hectares_municipality.csv")
+get_if_missing("https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/vdpb/vaehdpm/gasolina-de-aviacao/vendas-anuais-de-gasolina-de-aviacao-por-municipio.csv", "brazil_anp_avgas_municipality.csv")
+get_if_missing("https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/vdpb/vaehdpm/oleo-diesel/vendas-anuais-de-oleo-diesel-por-municipio.csv", "brazil_anp_diesel_municipality.csv")
+for (y in 2018:2026) get_if_missing(sprintf("https://public.tableau.com/views/Dadosparacidado_201925_03_2020/9-AutctonesreasEspeciais.csv?:showVizHome=no&YEAR(BR%%20Data%%20de%%20Notifica%%C3%%A7%%C3%%A3o)=%d", y),
+                                    sprintf("brazil_malaria_special_areas_%d.csv", y), 2)
+for (cc in c("COL", "BRA")) get_if_missing(sprintf("https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_%s_0.json.zip", cc), sprintf("gadm41_%s_0.json.zip", cc))
+# The Peruvian coca price file blocks scripted downloads (HTTP 418); it was downloaded with a browser user agent (see DOWNLOAD_LOG.csv)
+stopifnot(file.exists(file.path(REG, "peru_devida_coca_leaf_prices_2020_2023.xlsx")))
+```
+
+**Numbers typed by hand.** A few figures come from published reports, not
+from data files. We keep them in one table, so each has a source and
+appears in `output/numbers_in_brief.csv`. We only quote them. We never
+subtract them from our own numbers.
+
+```{r published}
+published <- tribble(
+  ~id, ~description, ~value, ~unit, ~source,
+  "maap233_mdd", "Cumulative mining deforestation, Madre de Dios, to mid 2025", 135939, "ha", "MAAP #233 (29 Sep 2025)",
+  "maap233_loreto", "Dredges recorded in Loreto, 2017 to 2025", 989, "records", "MAAP #233 (29 Sep 2025)",
+  "maap233_nanay", "Dredges recorded on the Nanay river since 2017", 841, "records", "MAAP #233 (29 Sep 2025)",
+  "maap233_nanay25", "Dredges recorded on the Nanay river in 2025", 275, "records", "MAAP #233 (29 Sep 2025)",
+  "maap233_amazonas", "Dredges recorded in Amazonas region since 2017", 174, "records", "MAAP #233 (29 Sep 2025)",
+  "maap233_water", "Water bodies with mining activity, Peruvian Amazon", 225, "rivers/streams", "MAAP #233 (29 Sep 2025)",
+  "maap185_2122", "Mining deforestation, southern Peruvian Amazon, 2021 and 2022", 18421, "ha", "MAAP #185 (15 Jun 2023)",
+  "maap195_2123", "Mining deforestation, southern Peruvian Amazon, 2021 to part of 2023", 23881, "ha", "MAAP #195 (19 Nov 2023)",
+  "maap208_total", "Mining deforestation, southern Peruvian Amazon, Jan 2021 to Mar 2024", 30846, "ha", "MAAP #208 (8 May 2024)",
+  "maap208_2123", "Mining deforestation, 2021 to 2023 (footnote 8)", 28292, "ha", "MAAP #208 (8 May 2024)",
+  "maap208_outside", "Share outside the Mining Corridor, Jan 2021 to Mar 2024", 26.2, "%", "MAAP #208 (8 May 2024)",
+  "maap208_cn", "Share in native communities", 14.6, "%", "MAAP #208 (8 May 2024)",
+  "maap208_za", "Share in buffer zones of protected areas", 7.9, "%", "MAAP #208 (8 May 2024)",
+  "maap241_2025", "Mining deforestation inside Tambopata National Reserve, 2025 (more than)", 400, "ha", "MAAP #241 via Amazon Conservation (12 May 2026)",
+  "maap241_total", "Mining deforestation inside Tambopata National Reserve, 2025 to early 2026 (about)", 500, "ha", "MAAP #241 via Amazon Conservation (12 May 2026)",
+  "maap241_struct", "Mining structures inside Tambopata National Reserve, Feb 2026", 183, "structures", "MAAP #241 via Amazon Conservation (12 May 2026)",
+  "maap241_camps", "Mining camps inside Tambopata National Reserve, Feb 2026", 67, "camps", "MAAP #241 via Amazon Conservation (12 May 2026)",
+  "amw_dash_peru", "AMW dashboard: total area affected by mining in Peru until 2026 Q2", 179900, "ha", "amazonminingwatch.org dashboard, read on 15 Oct 2026 (shown as 179.9k)",
+  "amw_dash_tamb", "AMW dashboard: total area affected by mining in Tambopata National Reserve until 2026 Q2", 2412, "ha", "amazonminingwatch.org dashboard, read on 15 Oct 2026",
+  "amw_panorama_h1", "AMW newsletter: new mining deforestation inside Tambopata National Reserve, first half of 2026", 786, "ha", "Amazon Mining Watch Panorama, issue 2 (Oct 2026)",
+  "gc_tamb_area", "Area with illegal mining activity inside Tambopata National Reserve, Oct 2025 to Jun 2026 (about)", 1000, "ha", "Global Conservation (M. Quispe), quoted by Mongabay Latam (27 Sep 2026)",
+  "rami_tamb_julaug", "Forest lost inside Tambopata National Reserve, Jul to Aug 2026", 1.68, "ha", "SERNANP RAMI radar monitoring, quoted by Mongabay Latam (27 Sep 2026)",
+  "bcrp_fx_sep2026", "Exchange rate, soles per USD, September 2026 average", 3.3789, "S/ per USD", "BCRP series PN01234PM, read on the BCRP website on 15 Oct 2026",
+  "aa_records", "Dredge records in Loreto, 2025 to Jun 2026 (more than)", 700, "records", "Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary)",
+  "aa_rivers", "Rivers in Loreto with dredges, 2025 to Jun 2026", 13, "rivers", "Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary)",
+  "aa_nanay", "Dredge detections on the Nanay, 2025 to Jun 2026", 421, "detections", "Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary)",
+  "c2_peru_2022", "Mining area, Peru, 2022, as published in Collection 2", 169300, "ha", "MapBiomas Peru Collection 2 post (Feb 2024)",
+  "c2_mdd_2022", "Mining area, Madre de Dios, 2022, as published in Collection 2 (about)", 82900, "ha", "MapBiomas Peru Collection 2 post (Feb 2024)",
+  "evoa_2025", "Colombia: land with alluvial gold exploitation (EVOA), 2025", 118410, "ha", "MinEnergía/UNODC press release (2 Oct 2026)",
+  "evoa_illicit", "Colombia: share of EVOA area that is illicit, 2025", 75, "%", "MinEnergía/UNODC press release (2 Oct 2026)",
+  "evoa_river_sectors", "Colombia: sectors with river mining alerts on 11 Amazon rivers, 2025", 215, "sectors", "MinEnergía/UNODC press release (2 Oct 2026)",
+  "evoa_coca_overlap", "Colombia: share of EVOA area overlapping coca, 2025", 48, "%", "MinEnergía/UNODC press release (2 Oct 2026)",
+  "escolhas_garimpo_2022", "Brazil: gold production registered by garimpos, 2022", 30761, "kg", "Instituto Escolhas note (Feb 2026), from ANM CFEM data",
+  "escolhas_garimpo_2025", "Brazil: gold production registered by garimpos, 2025", 5808, "kg", "Instituto Escolhas note (Feb 2026), from ANM CFEM data")
+pub <- function(id) published$value[published$id == id]
+knitr::kable(published %>% mutate(value = fmt(value, 1)), caption = "Published figures typed by hand (see DOWNLOAD_LOG.csv)")
+```
+
+## MapBiomas Peru, Collection 4
+
+```{r mapbiomas-read}
+f_pol <- file.path(RAW, "MAPBIOMAS-PERU-LULC-COL4-LIMITES-POLITICOS.xlsx")
+f_za  <- file.path(RAW, "MAPBIOMAS-PERU-LULC-COL4-ZONA-AMORTIGUAMIENTO.xlsx")
+f_anp <- file.path(RAW, "MAPBIOMAS-PERU-LULC-COL4-AREAS-PROTEGIDAS.xlsx")
+
+MINING <- 30                       # class 4.2 Minería
+FOREST <- c(3, 4, 5, 6)            # 1.1 Bosque, 1.2 Bosque seco, 1.3 Manglar, 1.4 Bosque inundable
+WATER  <- c(26, 31, 33)            # 5. Cuerpo de agua (river, lake, aquaculture)
+BEACH  <- 23                       # 4.3 Playa (river beaches)
+
+long_years <- function(d) d %>%
+  pivot_longer(matches("^y\\d{4}$"), names_to = "year", values_to = "ha") %>%
+  mutate(year = as.integer(sub("y", "", year)))
+
+# Coverage (stocks): one row per territory x class, one column per year
+cov_pol <- read_excel(f_pol, "COVERAGE_4") %>% long_years() %>%
+  transmute(biome = territory_level_2_1, department = territory_level_2_2, class, year, ha)
+cov_za  <- read_excel(f_za, "COVERAGE_4") %>% long_years() %>%
+  transmute(unit = territory_level_2_1, category = territory_level_3_1,
+            department = territory_level_2_2, class, year, ha)
+cov_anp <- read_excel(f_anp, "COVERAGE_4") %>% long_years() %>%
+  transmute(unit = territory_level_2_1, category = territory_level_3_1,
+            department = territory_level_2_2, class, year, ha)
+
+# Transitions (flows): area that moved from class_from to class_to between two consecutive years
+read_transitions <- function(file) {
+  read_excel(file, "TRANSITION_4") %>%
+    pivot_longer(matches("^p\\d{4}_\\d{4}$"), names_to = "period", values_to = "ha") %>%
+    mutate(y0 = as.integer(substr(period, 2, 5)), year = as.integer(substr(period, 7, 10))) %>%
+    filter(year - y0 == 1) %>%                     # keep one year periods; drop 5 year and 1985 to 2025 totals
+    mutate(ha = replace_na(ha, 0))
+}
+tr_pol <- read_transitions(f_pol) %>% rename(unit = territory_level_2)
+tr_za  <- read_transitions(f_za)  %>% rename(unit = territory_level_2)
+tr_anp <- read_transitions(f_anp) %>% rename(unit = territory_level_2)
+```
+
+```{r checks-mapbiomas}
+mdd_level <- cov_pol %>% filter(department == "Madre de Dios", class == MINING) %>%
+  group_by(year) %>% summarise(mining_ha = sum(ha), .groups = "drop")
+amazon_2025 <- cov_pol %>% filter(biome == "Amazonía", class == MINING, year == 2025) %>% pull(ha) %>% sum()
+tamb_za_2025 <- cov_za %>% filter(unit == "Tambopata", class == MINING, year == 2025) %>% pull(ha) %>% sum()
+mdd_za_2025  <- cov_za %>% filter(department == "Madre de Dios", class == MINING, year == 2025) %>% pull(ha) %>% sum()
+
+check("MapBiomas C4: Madre de Dios, mining, 2025 (ha)", mdd_level$mining_ha[mdd_level$year == 2025], 112622)
+check("MapBiomas C4: Peru, Amazon biome, mining, 2025 (ha)", amazon_2025, 118296)
+check("MapBiomas C4: Tambopata buffer zone, mining, 2025 (ha)", tamb_za_2025, 20730)
+check("MapBiomas C4: all buffer zones in Madre de Dios, mining, 2025 (ha)", mdd_za_2025, 34635)
+
+# Transitions must add up to the stock: land that stayed mining + land that came in = stock this year
+tr_mdd <- tr_pol %>% filter(unit == "Madre de Dios")
+recon <- tr_mdd %>% group_by(year) %>%
+  summarise(stock_from_transitions = sum(ha[class_to == MINING]), .groups = "drop") %>%
+  left_join(mdd_level, by = "year")
+check("Transitions reproduce the 2025 stock in Madre de Dios (ha)",
+      recon$stock_from_transitions[recon$year == 2025], 112622)
+
+log_number("chk_mdd_2025", "Mining area, Madre de Dios, 2025", mdd_level$mining_ha[mdd_level$year == 2025], "ha", "MapBiomas Peru C4, Limites politicos, COVERAGE_4, class 30")
+log_number("chk_amz_2025", "Mining area, Peru Amazon biome, 2025", amazon_2025, "ha", "MapBiomas Peru C4, Limites politicos")
+log_number("chk_tamb_za_2025", "Mining area, Tambopata buffer zone, 2025", tamb_za_2025, "ha", "MapBiomas Peru C4, Zona de amortiguamiento")
+```
+
+## Gold price (World Bank), exchange rate and prices in Peru (BCRP)
+
+```{r prices-read}
+pink <- read_excel(file.path(RAW, "CMO-Historical-Data-Monthly.xlsx"), sheet = "Monthly Prices", skip = 4) %>%
+  rename(month = 1) %>% filter(grepl("^\\d{4}M\\d{2}$", month)) %>%
+  transmute(date = as.Date(paste0(substr(month, 1, 4), "-", substr(month, 6, 7), "-01")),
+            gold_usd = as.numeric(Gold))
+
+es <- c(Ene = 1, Feb = 2, Mar = 3, Abr = 4, May = 5, Jun = 6, Jul = 7, Ago = 8, Sep = 9, Oct = 10, Nov = 11, Dic = 12)
+read_bcrp <- function(code, name) {
+  j <- fromJSON(file.path(RAW, paste0("bcrp_", code, ".json")))
+  tibble(period = j$periods$name, value = suppressWarnings(as.numeric(unlist(j$periods$values)))) %>%
+    transmute(date = as.Date(sprintf("%s-%02d-01", substr(period, 5, 8), es[substr(period, 1, 3)])),
+              !!name := value)
+}
+fx  <- read_bcrp("PN01234PM", "pen_per_usd")   # soles per US dollar, monthly average
+cpi <- read_bcrp("PN38705PM", "cpi_lima")      # Lima consumer price index, Dec 2021 = 100
+
+check("World Bank Pink Sheet: gold, August 2026 (USD per oz)", pink$gold_usd[pink$date == as.Date("2026-08-01")], 4411)
+check("BCRP website: exchange rate, September 2026 (soles per USD)", fx$pen_per_usd[fx$date == as.Date("2026-09-01")], pub("bcrp_fx_sep2026"), tol = 0.0001)
+log_number("gold_aug2026", "Gold price, August 2026", pink$gold_usd[pink$date == as.Date("2026-08-01")], "USD per oz", "World Bank Pink Sheet, Oct 2026 vintage")
+```
+
+## Amazon Mining Watch and official boundaries
+
+Amazon Mining Watch publishes two products. We use both.
+
+- **Detections**: squares of about 480 m by 480 m (about 23 ha) where a
+  computer model first sees mining. We count them as "patches".
+- **Scar map**: a map with 10 m pixels. Each mining pixel carries the
+  period when it was first mapped as mining. We add up the pixels to get
+  **hectares**. Amazon Mining Watch says this map is still "in
+  development" and that areas "run large" compared with areas drawn by
+  hand. So we trust **changes between periods** more than any single
+  total.
+
+Boundaries: GADM for departments; SERNANP for protected areas, buffer
+zones and titled native communities; INGEMMET (through SERNANP's map
+service) for mining concessions that are titled or in process.
+
+```{r amw-read}
+amw <- st_read(amw_file, quiet = TRUE)
+gadm_path <- paste0("/vsizip/", normalizePath(file.path(RAW, "gadm41_PER_1.json.zip")), "/gadm41_PER_1.json")
+dep1 <- st_read(gadm_path, quiet = TRUE)
+mdd_poly <- dep1 %>% filter(NAME_1 == "MadredeDios")
+anp <- st_read(file.path(RAW, "sernanp_anp_nacional_peru.geojson"), quiet = TRUE)
+za  <- st_read(file.path(RAW, "sernanp_zona_amortiguamiento_peru.geojson"), quiet = TRUE)
+cn  <- st_read(file.path(RAW, "sernanp_comunidades_nativas.geojson"), quiet = TRUE)
+conc <- bind_rows(st_read(file.path(RAW, "ingemmet_concessions_layer36.geojson"), quiet = TRUE),
+                  st_read(file.path(RAW, "ingemmet_concessions_layer37.geojson"), quiet = TRUE))
+anp_v <- st_make_valid(anp); za_v <- st_make_valid(za); cn_v <- st_make_valid(cn); conc_v <- st_make_valid(conc)
+
+# Each detection is a ~480 m square. Reduce it to its centre point.
+# "category" is exclusive, with a priority order: protected area > buffer zone > native community > rest.
+pts <- suppressWarnings(st_centroid(amw))
+pts <- pts[lengths(st_intersects(pts, mdd_poly)) > 0, ]
+inside <- function(p, poly) lengths(st_intersects(p, poly)) > 0
+pts <- pts %>% mutate(
+  category = case_when(inside(., anp_v) ~ "Protected area",
+                       inside(., za_v)  ~ "Buffer zone",
+                       inside(., cn_v)  ~ "Native community",
+                       TRUE ~ "Rest of Madre de Dios"),
+  period = case_when(grepl("^Q", onset) ~ paste0("20", substr(onset, 3, 4), " Q", substr(onset, 2, 2)),
+                     TRUE ~ onset))
+cat("Detections in Madre de Dios:", nrow(pts), "of", nrow(amw), "in the Amazon basin\n")
+log_number("amw_mdd_n", "Amazon Mining Watch detections in Madre de Dios (all periods)", nrow(pts), "patches", "Amazon Mining Watch, README dated 3 Oct 2026")
+```
+
+**Checks for the detections file.** These two checks stop the notebook
+if a new download differs from the version we used (the number of
+detections in the file, and the number in Peru first seen in 2024). The
+public dashboard shows hectares, not detections, so we check the
+dashboard against the scar map below.
+
+```{r amw-check}
+peru_poly <- st_union(dep1)
+amw_pts_all <- suppressWarnings(st_centroid(amw))
+peru_2024 <- sum(lengths(st_intersects(amw_pts_all[amw_pts_all$onset == "2024", ], peru_poly)) > 0)
+check("Amazon Mining Watch: features in the basin file (version of 3 Oct 2026)", nrow(amw), 232030, tol = 0.5)
+check("Amazon Mining Watch: Peru, first detected in 2024 (patches)", peru_2024, 2072, tol = 0.5)
+log_number("amw_peru_2024", "AMW detections in Peru with onset 2024 (version check)", peru_2024, "patches", "Amazon Mining Watch GeoJSON")
+```
+
+**From the scar map to hectares.** The map covers the whole Amazon and is
+almost empty, so we read only the tiles (1,024 by 1,024 pixels) that
+contain a detection in Peru. Each mining pixel gets the zones that
+contain its centre: department, protected area, buffer zone, native
+community, mining concession. Then we add up the pixel areas. This takes
+about one minute.
+
+```{r scar-hectares}
+scar_r <- rast(scar_file)
+amw_pe <- amw[lengths(st_intersects(amw, st_buffer(peru_poly, 0.01))) > 0, ]
+px <- res(scar_r)[1]; x0 <- xmin(scar_r); y0 <- ymax(scar_r); B <- 1024 * px
+bb <- t(sapply(st_geometry(amw_pe), function(g) as.numeric(st_bbox(g))))
+m <- 0.01                                            # margin of about 1 km around each detection
+tiles <- unique(bind_rows(
+  tibble(c = floor((bb[, 1] - m - x0) / B), r = floor((y0 - bb[, 4] - m) / B)),
+  tibble(c = floor((bb[, 3] + m - x0) / B), r = floor((y0 - bb[, 4] - m) / B)),
+  tibble(c = floor((bb[, 1] - m - x0) / B), r = floor((y0 - bb[, 2] + m) / B)),
+  tibble(c = floor((bb[, 3] + m - x0) / B), r = floor((y0 - bb[, 2] + m) / B))))
+
+dep_names <- recode(dep1$NAME_1, MadredeDios = "Madre de Dios", SanMartín = "San Martín")
+DEP <- vect(dep1); DEP$id <- seq_len(nrow(DEP))
+zone_layers <- list(
+  tamb_res = anp_v %>% filter(anp_nomb == "Tambopata"),
+  anp_any  = anp_v,
+  za_tb    = za_v %>% filter(grepl("Tambopata|Bahuaja-Sonene", anp_nomb)),   # shared buffer counted once, as Tambopata
+  za_am    = za_v %>% filter(grepl("Amarakaeri", anp_nomb)),
+  za_sira  = za_v %>% filter(grepl("Sira", anp_nomb)),
+  za_any   = za_v,
+  cn       = cn_v,
+  conc     = conc_v) %>% map(vect)
+
+scar_parts <- list()
+for (k in seq_len(nrow(tiles))) {
+  e <- ext(x0 + tiles$c[k] * B, x0 + (tiles$c[k] + 1) * B, y0 - (tiles$r[k] + 1) * B, y0 - tiles$r[k] * B)
+  rb <- crop(scar_r, e); v <- values(rb, mat = FALSE); i <- which(!is.na(v) & v > 0)
+  if (!length(i)) next
+  d <- tibble(code = v[i], ha = values(cellSize(rb, unit = "ha"), mat = FALSE)[i])
+  dv <- crop(DEP, e)
+  d$dep <- if (nrow(dv)) values(rasterize(dv, rb, field = "id"), mat = FALSE)[i] else NA_integer_
+  for (nm in names(zone_layers)) {
+    lv <- crop(zone_layers[[nm]], e)
+    d[[nm]] <- if (nrow(lv)) !is.na(values(rasterize(lv, rb, field = 1), mat = FALSE)[i]) else FALSE
+  }
+  scar_parts[[length(scar_parts) + 1]] <- d %>% group_by(across(-ha)) %>% summarise(ha = sum(ha), pixels = n(), .groups = "drop")
+}
+scar <- bind_rows(scar_parts) %>% group_by(across(-c(ha, pixels))) %>%
+  summarise(ha = sum(ha), pixels = sum(pixels), .groups = "drop") %>%
+  filter(!is.na(dep)) %>%                                                   # keep pixels inside Peru
+  mutate(department = dep_names[dep],
+         period = if_else(code < 3000, as.character(code), paste0(substr(code, 1, 4), " Q", substr(code, 5, 5))),
+         mdd = department == "Madre de Dios",
+         title = case_when(anp_any ~ "1 Protected area",
+                           za_any & !conc ~ "2 Buffer zone, no mining title",
+                           !conc ~ "3 Elsewhere, no mining title",
+                           TRUE ~ "4 Inside a mining concession"))
+write_csv(scar, file.path(OUT, "table_scar_hectares_by_zone.csv"))
+
+# Check against Amazon Mining Watch's own table of hectares (same release, published 5 Oct 2026)
+jur <- read_csv(file.path(RAW, "amw_mined_areas_by_jurisdiction.csv"), show_col_types = FALSE)
+jur_pe   <- sum(jur$intersected_area_ha[jur$type == "national_admin" & jur$country_code %in% "PE"])
+jur_tamb <- sum(jur$intersected_area_ha[jur$type == "protected_areas" & jur$name == "Tambopata"])
+check("AMW scar map: Peru, all periods (ha; within 0.1%)", sum(scar$ha), jur_pe, tol = 0.001 * jur_pe)
+check("AMW scar map: Tambopata National Reserve, all periods (ha; within 1%)", sum(scar$ha[scar$tamb_res]), jur_tamb, tol = 0.01 * jur_tamb)
+# Check against the public dashboard (amazonminingwatch.org), which shows hectares up to 2026 Q2
+upto_q2 <- scar$code != 20263
+check("AMW dashboard: Peru, until 2026 Q2 (ha; dashboard rounds to 0.1k)", sum(scar$ha[upto_q2]), pub("amw_dash_peru"), tol = 100)
+check("AMW dashboard: Tambopata National Reserve, until 2026 Q2 (ha; within 1%)", sum(scar$ha[upto_q2 & scar$tamb_res]), pub("amw_dash_tamb"), tol = 0.01 * pub("amw_dash_tamb"))
+log_number("scar_peru_all", "AMW new scar, Peru, all periods 2018 to 2026 Q3", sum(scar$ha), "ha", "AMW scar map (our sum)")
+log_number("scar_peru_all_amw", "AMW new scar, Peru, all periods, AMW's own table", jur_pe, "ha", "AMW mined_areas_by_jurisdiction.csv")
+```
+
+# What happened in Madre de Dios
+
+The MapBiomas tables give a **stock**: all land classified as mining in
+a year. The stock rarely goes down, so it rises over time almost
+whatever happens. We therefore use **flows**. The transition sheet tells
+us how much land **came into** mining each year, and from which class
+(forest, water, beach, other), and how much **left** mining.
+
+```{r describe-table}
+flows <- tr_mdd %>% filter(year >= 2001) %>%
+  mutate(origin = case_when(class_from %in% FOREST ~ "from_forest",
+                            class_from %in% WATER  ~ "from_water",
+                            class_from == BEACH    ~ "from_beach",
+                            TRUE                   ~ "from_other")) %>%
+  group_by(year) %>%
+  summarise(gross_in   = sum(ha[class_to == MINING & class_from != MINING]),
+            from_forest = sum(ha[class_to == MINING & origin == "from_forest"]),
+            from_water  = sum(ha[class_to == MINING & origin == "from_water"]),
+            from_beach  = sum(ha[class_to == MINING & origin == "from_beach"]),
+            from_other  = sum(ha[class_to == MINING & origin == "from_other" & class_from != MINING]),
+            gross_out   = sum(ha[class_from == MINING & class_to != MINING]),
+            .groups = "drop") %>%
+  left_join(mdd_level, by = "year") %>%
+  mutate(net_addition = mining_ha - lag(mining_ha))
+flows$net_addition[flows$year == 2001] <- mdd_level$mining_ha[mdd_level$year == 2001] - mdd_level$mining_ha[mdd_level$year == 2000]
+
+stopifnot(all(abs(flows$gross_in - flows$gross_out - flows$net_addition) < 1))   # flows add up
+
+for (y in 2021:2023) check(paste("Net addition, Madre de Dios,", y, "(ha, Q5 card)"),
+                           flows$net_addition[flows$year == y], c(`2021` = 4940, `2022` = 10540, `2023` = 19339)[as.character(y)])
+
+flows %>% filter(year >= 2014) %>%
+  transmute(Year = year, `Stock (ha)` = fmt(mining_ha), `Net addition` = fmt(net_addition),
+            `Came in` = fmt(gross_in), `from forest` = fmt(from_forest), `from water` = fmt(from_water),
+            `from beaches` = fmt(from_beach), `from other land` = fmt(from_other), `Left mining` = fmt(gross_out)) %>%
+  knitr::kable(caption = "Madre de Dios, MapBiomas Peru Collection 4: mining stock and flows (ha)", align = "r")
+write_csv(flows, file.path(OUT, "table1_mdd_mining_flows.csv"))
+```
+
+```{r describe-numbers, include = FALSE}
+f <- function(y, v) flows[[v]][flows$year == y]
+share_water_2023 <- f(2023, "from_water") / f(2023, "gross_in")
+log_number("net_2021", "Net addition, Madre de Dios, 2021", f(2021, "net_addition"), "ha", "MapBiomas C4")
+log_number("net_2022", "Net addition, Madre de Dios, 2022", f(2022, "net_addition"), "ha", "MapBiomas C4")
+log_number("net_2023", "Net addition, Madre de Dios, 2023", f(2023, "net_addition"), "ha", "MapBiomas C4")
+log_number("net_2024", "Net addition, Madre de Dios, 2024", f(2024, "net_addition"), "ha", "MapBiomas C4")
+log_number("net_2025", "Net addition, Madre de Dios, 2025", f(2025, "net_addition"), "ha", "MapBiomas C4")
+for (y in 2021:2025) log_number(paste0("ff_", y), paste("Forest to mining, Madre de Dios,", y), f(y, "from_forest"), "ha", "MapBiomas C4 transitions")
+log_number("water_2022", "Water to mining, Madre de Dios, 2022", f(2022, "from_water"), "ha", "MapBiomas C4 transitions")
+log_number("water_2023", "Water to mining, Madre de Dios, 2023", f(2023, "from_water"), "ha", "MapBiomas C4 transitions")
+log_number("water_2024", "Water to mining, Madre de Dios, 2024", f(2024, "from_water"), "ha", "MapBiomas C4 transitions")
+log_number("share_water_2023", "Share of land coming into mining that was water, 2023", 100 * share_water_2023, "%", "MapBiomas C4 transitions")
+log_number("gross_in_2025", "Land coming into mining, Madre de Dios, 2025", f(2025, "gross_in"), "ha", "MapBiomas C4 transitions")
+log_number("gross_out_2024", "Land leaving mining, Madre de Dios, 2024", f(2024, "gross_out"), "ha", "MapBiomas C4 transitions")
+log_number("gross_out_2025", "Land leaving mining, Madre de Dios, 2025", f(2025, "gross_out"), "ha", "MapBiomas C4 transitions")
+log_number("gross_out_2001_2025", "Land leaving mining, Madre de Dios, 2001 to 2025 (a pixel can count more than once)", sum(flows$gross_out[flows$year >= 2001]), "ha", "MapBiomas C4 transitions")
+log_number("share_mdd_amazon", "Madre de Dios share of mining area in Peru's Amazon biome, 2025", 100 * f(2025, "mining_ha") / amazon_2025, "%", "MapBiomas C4")
+```
+
+We describe Madre de Dios because it holds
+`r round(100 * f(2025, "mining_ha") / amazon_2025)`% of the mining land
+in Peru's Amazon (2025).
+
+**[Description]** The net addition (stock this year minus stock last
+year) more than doubled in 2022 (`r fmt(f(2022,"net_addition"))` ha, up
+from `r fmt(f(2021,"net_addition"))` ha) and almost doubled again in
+2023 (`r fmt(f(2023,"net_addition"))` ha). But the flows show that much
+of the 2023 jump was not new forest loss. In 2023,
+`r fmt(f(2023,"from_water"))` ha that came into mining had been **water**
+the year before (`r round(100*share_water_2023)`% of all land coming
+in). In 2022 it was `r fmt(f(2022,"from_water"))` ha, and in 2024
+`r fmt(f(2024,"from_water"))` ha. Forest that became mining grew more
+slowly: `r fmt(f(2021,"from_forest"))`, `r fmt(f(2022,"from_forest"))`
+and `r fmt(f(2023,"from_forest"))` ha in 2021, 2022 and 2023.
+
+**Why would water become mining?** Old mining pits fill with water and
+the map then calls them water. If miners come back, or if the map
+changes its mind, the same land is called mining again. Mining can also
+move into river channels. The map cannot tell these stories apart
+**[Interpretation, not tested]**. **So what did we decide?** Our yearly
+indicator (KPI 4) counts only **forest that became mining**, not the net
+addition.
+
+```{r fig-flows, fig.height = 4.5}
+flows %>% filter(year >= 2010) %>%
+  select(year, `Forest` = from_forest, `Rivers and water` = from_water, `Beaches` = from_beach, `Other cleared land` = from_other) %>%
+  pivot_longer(-year, names_to = "origin", values_to = "ha") %>%
+  mutate(origin = factor(origin, levels = c("Other cleared land", "Beaches", "Rivers and water", "Forest"))) %>%
+  ggplot(aes(year, ha, fill = origin)) + geom_col(width = 0.8) +
+  geom_point(data = filter(flows, year >= 2010), aes(year, net_addition), inherit.aes = FALSE, shape = 21, fill = "white", size = 2) +
+  scale_fill_manual(values = c("Forest" = col_main, "Rivers and water" = "#5DADE2", "Beaches" = "#F5CBA7", "Other cleared land" = col_grey)) +
+  scale_y_continuous(labels = scales::comma) + scale_x_continuous(breaks = seq(2010, 2025, 3)) +
+  labs(title = "Madre de Dios: where new mining land came from each year",
+       subtitle = "Bars: land that came into mining, by what it was the year before. White dots: net addition (change in the stock).",
+       x = NULL, y = "ha per year", fill = NULL,
+       caption = "Source: MapBiomas Peru, Collection 4, TRANSITION_4 sheet (Limites politicos), class 30 Minería.")
+ggsave(file.path(OUT, "fig_flows_by_origin.png"), width = 9, height = 4.5, dpi = 200, bg = "white")
+```
+
+The next chart shows one year as steps: the 2024 stock, plus what came
+in, minus what left, gives the 2025 stock.
+
+```{r fig-waterfall, fig.height = 4}
+w <- flows %>% filter(year == 2025)
+wf <- tibble(step = c("Stock 2024", "+ from forest", "+ from water", "+ from beaches", "+ from other land", "left mining", "Stock 2025"),
+             delta = c(mdd_level$mining_ha[mdd_level$year == 2024], w$from_forest, w$from_water, w$from_beach, w$from_other, -w$gross_out, NA)) %>%
+  mutate(end = cumsum(replace_na(delta, 0)), start = lag(end, default = 0),
+         start = if_else(step == "Stock 2025", 0, start), end = if_else(step == "Stock 2025", lag(end), end),
+         type = case_when(step %in% c("Stock 2024", "Stock 2025") ~ "stock", delta < 0 ~ "out", TRUE ~ "in"),
+         step = factor(step, step), label = fmt(abs(end - start)))
+ggplot(wf, aes(x = step)) +
+  geom_rect(aes(xmin = as.numeric(step) - 0.4, xmax = as.numeric(step) + 0.4, ymin = start, ymax = end, fill = type)) +
+  geom_text(aes(y = pmax(start, end), label = label), vjust = -0.4, size = 3) +
+  scale_fill_manual(values = c(stock = col_grey, `in` = col_main, out = col_soft), guide = "none") +
+  scale_y_continuous(labels = scales::comma) + coord_cartesian(ylim = c(90000, 125000)) +
+  labs(title = "From the 2024 stock to the 2025 stock in Madre de Dios (ha)",
+       subtitle = paste0("Net addition (", fmt(w$net_addition), " ha) = land that came in (", fmt(w$gross_in),
+                         " ha) minus land that left (", fmt(w$gross_out), " ha)"),
+       x = NULL, y = "ha", caption = "Source: MapBiomas Peru, Collection 4, TRANSITION_4. Note: the vertical axis starts at 90,000 ha.")
+ggsave(file.path(OUT, "fig_waterfall_2025.png"), width = 9, height = 4, dpi = 200, bg = "white")
+```
+
+## What old mining became
+
+The same transition sheet tells us what land became when it **left**
+mining (rows with `class_from = 30`).
+
+```{r left-mining}
+left_to <- tr_mdd %>% filter(class_from == MINING, class_to != MINING, year >= 2016) %>%
+  mutate(to = case_when(class_to %in% FOREST ~ "Forest (regrowth)",
+                        class_to == 21       ~ "Farmland or pasture",
+                        class_to == BEACH    ~ "River beach",
+                        class_to %in% c(11, 51) ~ "Flooded grassland",
+                        class_to %in% WATER  ~ "Water (flooded pits, rivers)",
+                        TRUE                 ~ "Other (bare land, urban)")) %>%
+  group_by(year, to) %>% summarise(ha = sum(ha), .groups = "drop")
+lt25 <- left_to %>% filter(year == 2025) %>% mutate(share = 100 * ha / sum(ha)) %>% arrange(desc(ha))
+knitr::kable(lt25 %>% transmute(`Mining land in 2024 that became...` = to, `ha in 2025` = fmt(ha), `Share (%)` = round(share)),
+             caption = "Madre de Dios: what land that left mining in 2025 became (MapBiomas Peru C4, TRANSITION_4)")
+write_csv(left_to, file.path(OUT, "table1b_mining_left_to.csv"))
+lt <- function(x) lt25$share[lt25$to == x]
+for (x in lt25$to) log_number(paste0("left_", gsub("[^a-z]", "", tolower(x))), paste("Share of land leaving mining in 2025 that became:", x), lt(x), "%", "MapBiomas C4 transitions")
+m2w_2122 <- sum(left_to$ha[left_to$to == "Water (flooded pits, rivers)" & left_to$year %in% 2021:2022])
+log_number("mining_to_water_2122", "Mining land relabelled as water, Madre de Dios, 2021 and 2022", m2w_2122, "ha", "MapBiomas C4 transitions")
+```
+
+```{r fig-left-mining, fig.height = 3.8}
+ggplot(left_to, aes(year, ha, fill = to)) + geom_col() +
+  scale_fill_manual(values = c("Forest (regrowth)" = "#27AE60", "Farmland or pasture" = "#A0522D", "River beach" = "#F5CBA7",
+                               "Flooded grassland" = "#C8D96F", "Water (flooded pits, rivers)" = "#5DADE2", "Other (bare land, urban)" = col_grey), name = NULL) +
+  scale_y_continuous(labels = scales::comma) + scale_x_continuous(breaks = 2016:2025) +
+  labs(title = "Madre de Dios: what land leaving mining became each year",
+       x = NULL, y = "ha per year", caption = "Source: MapBiomas Peru, Collection 4, TRANSITION_4 (rows with class_from = 30, Minería).")
+ggsave(file.path(OUT, "fig_left_mining.png"), width = 9, height = 3.8, dpi = 200, bg = "white")
+```
+
+**[Description]** In 2025, `r fmt(sum(lt25$ha))` ha left mining:
+`r round(lt("Forest (regrowth)"))`% became forest again,
+`r round(lt("Farmland or pasture"))`% farmland or pasture,
+`r round(lt("River beach"))`% river beach,
+`r round(lt("Flooded grassland"))`% flooded grassland and
+`r round(lt("Water (flooded pits, rivers)"))`% water. These are
+different stories on the ground: an old mine growing back as young,
+poor forest; people farming old mining land; a river covering a mined
+bank; a pit filling with water. Some changes are also the map changing
+its mind about pixels at the edges. So "left mining" does **not** mean
+the damage was repaired. The water line also shows the back and forth
+behind the 2023 jump: `r fmt(m2w_2122)` ha of mining land was labelled
+water in 2021 and 2022, and `r fmt(f(2023, "from_water"))` ha of water
+was labelled mining in 2023.
+
+## Three ways to count "new mining"
+
+Different sources count different things. We put three yearly counts for
+Madre de Dios side by side. They answer different questions, so we never
+subtract one from another.
+
+```{r three-counts}
+scar_mdd_year <- scar %>% filter(mdd, code %in% 2019:2024) %>% group_by(year = code) %>% summarise(scar_ha = sum(ha))
+three_counts <- flows %>% filter(year %in% 2019:2024) %>% select(year, from_forest, net_addition) %>%
+  left_join(scar_mdd_year, "year")
+knitr::kable(three_counts %>% transmute(Year = year, `Forest that became mining (MapBiomas)` = fmt(from_forest),
+                                        `Net addition to the mining stock (MapBiomas)` = fmt(net_addition),
+                                        `Land seen as mining for the first time since 2018 (AMW scar map)` = fmt(scar_ha)),
+             caption = "Madre de Dios: three yearly counts of new mining (ha)")
+write_csv(three_counts, file.path(OUT, "table2b_three_counts.csv"))
+cum_forest_to_mining <- sum(tr_mdd$ha[tr_mdd$class_to == MINING & tr_mdd$class_from %in% FOREST])
+log_number("cum_ff", "Cumulative forest to mining, Madre de Dios, 1985 to 2025", cum_forest_to_mining, "ha", "MapBiomas C4 transitions")
+for (y in 2021:2023) log_number(paste0("scar_mdd_", y), paste("AMW new scar, Madre de Dios,", y), three_counts$scar_ha[three_counts$year == y], "ha", "AMW scar map (our sum)")
+```
+
+**[Description]** The Amazon Mining Watch count stays almost flat:
+`r fmt(min(three_counts$scar_ha))` to `r fmt(max(three_counts$scar_ha))`
+ha a year in 2019 to 2024, and 2022 was its *lowest* year. In the same
+years the MapBiomas net addition jumped. The reason is what each one
+counts. Amazon Mining Watch counts a piece of land only **the first
+time** it is seen as mining. Mining again in an old pit, or a flooded pit
+that is mapped as mining again, is not new for Amazon Mining Watch, but
+it is new for the MapBiomas stock. **This supports our reading of 2023:
+much of the surge happened on land that was already mined before.** It
+also tells us how to use Amazon Mining Watch: it is good at showing
+mining that reaches **new places**, not at measuring the total amount of
+mining.
+
+Two cumulative numbers are also often quoted. MapBiomas, summed over all
+years, gives `r fmt(cum_forest_to_mining)` ha of forest turned into
+mining in Madre de Dios since 1985. MAAP reports
+`r fmt(pub("maap233_mdd"))` ha of mining deforestation up to mid 2025
+(MAAP #233). MAAP joins several methods and image sources, so the two
+numbers differ for good reasons.
+
+## Buffer zones compared with the rest of Madre de Dios
+
+Two groups and two periods: the buffer zones of protected areas in Madre
+de Dios, and the rest of the department; before the surge (2016 to 2020)
+and during and after it (2021 to 2025).
+
+```{r compare}
+za_mdd <- cov_za %>% filter(department == "Madre de Dios", class == MINING) %>%
+  group_by(year) %>% summarise(za = sum(ha), .groups = "drop")
+anp_mdd <- cov_anp %>% filter(department == "Madre de Dios", class == MINING) %>%
+  group_by(year) %>% summarise(anp = sum(ha), .groups = "drop")
+area_za  <- cov_za  %>% filter(department == "Madre de Dios", year == 2025) %>% pull(ha) %>% sum()
+area_anp <- cov_anp %>% filter(department == "Madre de Dios", year == 2025) %>% pull(ha) %>% sum()
+area_mdd <- cov_pol %>% filter(department == "Madre de Dios", year == 2025) %>% pull(ha) %>% sum()
+
+zones <- mdd_level %>% left_join(za_mdd, "year") %>% left_join(anp_mdd, "year") %>%
+  mutate(rest = mining_ha - za - anp) %>%
+  pivot_longer(c(za, anp, rest), names_to = "zone", values_to = "stock") %>%
+  group_by(zone) %>% arrange(year) %>% mutate(addition = stock - lag(stock)) %>% ungroup() %>%
+  mutate(zone = recode(zone, za = "Buffer zones", anp = "Protected areas", rest = "Rest of Madre de Dios"),
+         area = case_when(zone == "Buffer zones" ~ area_za, zone == "Protected areas" ~ area_anp,
+                          TRUE ~ area_mdd - area_za - area_anp))
+
+four <- zones %>% filter(zone != "Protected areas", year %in% 2016:2025) %>%
+  mutate(period = if_else(year <= 2020, "2016 to 2020", "2021 to 2025")) %>%
+  group_by(zone, period) %>%
+  summarise(mean_addition = mean(addition), per_1000ha = 1000 * mean(addition) / first(area), .groups = "drop")
+four %>% transmute(Group = zone, Period = period, `Mean yearly addition (ha)` = fmt(mean_addition),
+                   `per 1,000 ha of the group` = fmt(per_1000ha, 2)) %>%
+  knitr::kable(caption = "Four numbers: mean yearly net addition to mining land", align = "llrr")
+write_csv(four, file.path(OUT, "table2_compare_four_numbers.csv"))
+for (i in seq_len(nrow(four))) log_number(paste0("cmp_", i), paste("Mean yearly addition,", four$zone[i], four$period[i]), four$mean_addition[i], "ha/yr", "MapBiomas C4 coverage")
+dd <- four %>% select(zone, period, mean_addition) %>% pivot_wider(names_from = period, values_from = mean_addition)
+```
+
+```{r fig-compare, fig.height = 3}
+ggplot(four, aes(x = per_1000ha, y = zone)) +
+  geom_line(aes(group = zone), colour = col_grey, linewidth = 2) +
+  geom_point(aes(colour = period), size = 4) +
+  geom_text(aes(label = fmt(mean_addition), colour = period), vjust = -1.1, size = 3, show.legend = FALSE) +
+  scale_colour_manual(values = c("2016 to 2020" = col_grey, "2021 to 2025" = col_alert), name = NULL) +
+  scale_x_continuous(limits = c(0, NA)) +
+  labs(title = "Mean yearly addition to mining, per 1,000 ha of each group", subtitle = "Labels: mean hectares per year",
+       x = "ha added per year per 1,000 ha", y = NULL, caption = "Source: MapBiomas Peru, Collection 4 (coverage).")
+```
+
+**[Description]** Yearly additions in the buffer zones rose from
+`r fmt(dd$"2016 to 2020"[dd$zone=="Buffer zones"])` to
+`r fmt(dd$"2021 to 2025"[dd$zone=="Buffer zones"])` ha. In the rest of
+the department they rose from
+`r fmt(dd$"2016 to 2020"[dd$zone=="Rest of Madre de Dios"])` to
+`r fmt(dd$"2021 to 2025"[dd$zone=="Rest of Madre de Dios"])` ha. We
+start the second period in 2021 because our card defines the surge as
+2021 to 2023, and because 2021 is the first year when forest turned into
+mining crossed its red line (KPI 4). The rest of the department faces
+the same gold price, roads and weather, so it is a fair comparison. It
+is **not** a control group: the buffer zones were drawn around areas
+already under pressure, and mining can move between the two groups.
+
+# The five indicators
+
+## KPI 1 (early, monthly): the gold price in soles
+
+**Why.** A miner in Madre de Dios is paid in soles, and buys fuel, food
+and labour in soles. So we turn the dollar price into soles and remove
+inflation (Lima consumer prices). Then we compare it with its own
+average over the **previous 36 months**. When gold is worth much more
+than usual, mining pays better, and more people may start mining.
+
+**Red line: the ratio reaches 1.20**, which means 20% above the 3 year
+average.
+
+```{r kpi1}
+gold <- pink %>% inner_join(fx, "date") %>% inner_join(cpi, "date") %>%
+  filter(!is.na(pen_per_usd), !is.na(cpi_lima)) %>% arrange(date) %>%
+  mutate(gold_pen = gold_usd * pen_per_usd,
+         gold_real_pen = gold_pen / cpi_lima * 100,                         # soles of December 2021
+         trailing36 = rollapplyr(lag(gold_real_pen), 36, mean, fill = NA),  # previous 36 months only
+         ratio = gold_real_pen / trailing36,
+         signal = ratio >= 1.20)
+latest <- tail(filter(gold, !is.na(ratio)), 1)
+first_signals <- gold %>% filter(signal, date >= as.Date("2016-01-01")) %>%
+  mutate(run = cumsum(c(1, diff(as.numeric(date)) > 40))) %>% group_by(run) %>% slice(1) %>% ungroup()
+knitr::kable(first_signals %>% transmute(`First month above the red line` = format(date, "%b %Y"),
+                                         `Real price (soles of Dec 2021 per oz)` = fmt(gold_real_pen), Ratio = round(ratio, 2)),
+             caption = "KPI 1: months when a new period above the red line started (since 2016)")
+log_number("k1_latest_ratio", paste("Real gold price in soles / previous 36 month mean,", format(latest$date, "%b %Y")), latest$ratio, "ratio", "Pink Sheet + BCRP")
+for (i in seq_len(nrow(first_signals))) log_number(paste0("k1_episode_", i), "KPI 1: first month of a period above the red line (yyyymm)", as.numeric(format(first_signals$date[i], "%Y%m")), "yyyymm", "Pink Sheet + BCRP")
+log_number("k1_latest_real", paste("Real gold price, soles of Dec 2021,", format(latest$date, "%b %Y")), latest$gold_real_pen, "S/ per oz", "Pink Sheet + BCRP")
+g21 <- gold %>% mutate(y = as.integer(format(date, "%Y"))) %>% group_by(y) %>%
+  summarise(usd = mean(gold_usd), real_pen = mean(gold_real_pen), .groups = "drop") %>%
+  mutate(chg_usd = 100 * (usd / lag(usd) - 1), chg_real_pen = 100 * (real_pen / lag(real_pen) - 1))
+knitr::kable(g21 %>% filter(y %in% 2019:2026) %>% transmute(Year = y, `USD per oz` = fmt(usd), `Change in USD (%)` = round(chg_usd, 1),
+                                                           `Real soles per oz` = fmt(real_pen), `Change in real soles (%)` = round(chg_real_pen, 1)),
+             caption = "Yearly averages (2026: January to the latest month)")
+```
+
+```{r fig-kpi1, fig.height = 3.8}
+ggplot(filter(gold, date >= as.Date("2015-01-01")), aes(date, ratio)) +
+  geom_hline(yintercept = 1, colour = col_grey) +
+  geom_hline(yintercept = 1.2, colour = col_alert, linetype = "dashed") +
+  geom_line(colour = col_main, linewidth = 0.8) +
+  annotate("text", x = as.Date("2015-06-01"), y = 1.23, label = "Red line: 20% above the 3 year average", hjust = 0, size = 3, colour = col_alert) +
+  labs(title = "KPI 1: real gold price in soles compared with its previous 3 year average",
+       x = NULL, y = "Ratio", caption = "Sources: World Bank Pink Sheet (Oct 2026); BCRP series PN01234PM (soles per USD) and PN38705PM (Lima CPI).")
+ggsave(file.path(OUT, "fig_kpi1_gold.png"), width = 9, height = 3.8, dpi = 200, bg = "white")
+```
+
+**[Description]** In `r format(latest$date, "%B %Y")` the real gold
+price in soles was `r round(100*(latest$ratio-1))`% above its average of
+the previous three years, so **KPI 1 is red today**. It first crossed
+the red line in `r format(first_signals$date[1], "%B %Y")`, before the
+2021 to 2023 surge. New periods above the line started in
+`r paste(format(first_signals$date, "%b %Y"), collapse = ", ")`.
+
+**What it does not show.** Where mining will happen, or how much. It is
+a signal of pressure, not a forecast of hectares.
+
+### Why did mining keep growing when the real price fell in 2022 and 2023?
+
+```{r price-puzzle}
+price_y <- gold %>% mutate(year = as.integer(format(date, "%Y"))) %>% filter(year <= 2025) %>%
+  group_by(year) %>% summarise(real_pen = mean(gold_real_pen), .groups = "drop")
+pz <- flows %>% select(year, from_forest) %>% inner_join(price_y, "year") %>% arrange(year) %>%
+  mutate(d_ff = from_forest - lag(from_forest), d_lp = log(real_pen) - log(lag(real_pen)))
+lag_cor <- map_dfr(0:3, function(k) {
+  d <- pz %>% filter(year >= 2003) %>% mutate(x = lag(d_lp, k)) %>% filter(!is.na(x), !is.na(d_ff))
+  ct <- cor.test(d$d_ff, d$x)
+  tibble(`Price change measured...` = c("in the same year", "1 year earlier", "2 years earlier", "3 years earlier")[k + 1],
+         Correlation = round(unname(ct$estimate), 2), `p value` = round(ct$p.value, 2), Years = nrow(d))
+})
+knitr::kable(pz %>% filter(year >= 2017) %>% transmute(Year = year, `Real gold price (soles of Dec 2021 per oz)` = fmt(real_pen), `Forest that became mining (ha)` = fmt(from_forest)),
+             caption = "Real gold price in soles and forest that became mining, Madre de Dios")
+knitr::kable(lag_cor, caption = "Correlation between the yearly change in forest that became mining and the change in the real gold price, 2003 to 2025")
+pre <- mean(pz$real_pen[pz$year %in% 2017:2019])
+above_pre <- 100 * (mean(pz$real_pen[pz$year %in% 2022:2023]) / pre - 1)
+log_number("price_2223_vs_1719", "Real gold price in soles, 2022 and 2023 average vs 2017 to 2019 average", above_pre, "%", "Pink Sheet + BCRP")
+log_number("lagcor_1", "Correlation: change in forest to mining vs change in real price one year earlier", lag_cor$Correlation[2], "r", "MapBiomas C4 + Pink Sheet + BCRP")
+```
+
+**[Description]** In real soles the gold price fell
+`r round(100 * (1 - pz$real_pen[pz$year == 2022] / pz$real_pen[pz$year == 2021]))`%
+in 2022 and another
+`r round(100 * (1 - pz$real_pen[pz$year == 2023] / pz$real_pen[pz$year == 2022]))`%
+in 2023. But it was still `r round(above_pre)`% above its 2017 to 2019
+average. Profit depends on the **level** of the price, so mining still
+paid very well. The yearly change in forest turned into mining does not
+move with the price change of the same year
+(r = `r lag_cor$Correlation[1]`). It moves a little with the price
+change one and two years earlier (r = `r lag_cor$Correlation[2]` and
+`r lag_cor$Correlation[3]`). This fits a **delayed response**: opening a
+new site needs machines, workers and access. But with about 20 years of
+data these correlations could be chance (p =
+`r lag_cor$"p value"[2]` and `r lag_cor$"p value"[3]`). Other things
+also changed in those years: COVID 19, weaker enforcement after
+Operation Mercurio, and (for the net addition only) the 2023 water
+relabelling **[Interpretation, not tested]**. We cannot separate these
+causes. This is why KPI 1 is a pressure signal, not a forecast.
+
+## KPI 2 (early, monthly): Peru's gold gap
+
+**Why.** Peru's Central Bank publishes every month how much gold Peru
+**exported** and how much gold mines **declared as produced**. If Peru
+exports much more gold than it declares, the difference has no declared
+origin. Part of it is likely illegal gold that entered the legal chain.
+Both numbers come from the same publisher, so the subtraction is fair.
+
+**How we measure it.** We use 12 months at a time (to remove the
+seasons): the gap = (exports minus declared production) as a share of
+exports.
+
+**Red line: the gap jumps.** The gap has been high since 2017, so a
+fixed level would be red every year and tell FZS nothing new. Instead,
+the red line is a **jump**: the 12 month gap is more than *X* points
+higher than one year earlier. We set *X* the same way as our other
+statistical red lines: the average yearly change in calm years (2014 to
+2016) plus two standard deviations.
+
+```{r kpi2}
+b <- fromJSON(file.path(REG, "bcrp_gold_exports_production.json"))
+bm <- tibble(p = b$periods$name, v = b$periods$values) %>%
+  mutate(year = as.integer(substr(p, 5, 8)), month = es[substr(p, 1, 3)],
+         export_t = map_dbl(v, ~ suppressWarnings(as.numeric(.x[1]))) * 31.1035 / 1000,   # thousand troy oz -> tonnes (fine gold)
+         prod_t   = map_dbl(v, ~ suppressWarnings(as.numeric(.x[2]))) / 1e6) %>%          # fine grams -> tonnes
+  select(-v, -p) %>% filter(!is.na(export_t), !is.na(prod_t))
+gap_y <- bm %>% group_by(year) %>% filter(n() == 12) %>%
+  summarise(export_t = sum(export_t), prod_t = sum(prod_t), .groups = "drop") %>%
+  mutate(gap_t = export_t - prod_t, gap_pct = 100 * gap_t / export_t, change = gap_pct - lag(gap_pct))
+h1_26 <- bm %>% filter(year == 2026, month <= 6) %>% summarise(e = sum(export_t), p = sum(prod_t)) %>% mutate(pct = 100 * (e - p) / e)
+
+# Monthly: 12 month gap, and its change against the same month one year earlier
+bm_roll <- bm %>% arrange(year, month) %>%
+  mutate(date = as.Date(sprintf("%d-%02d-01", year, month)),
+         gap12 = 100 * (1 - rollapplyr(prod_t, 12, sum, fill = NA) / rollapplyr(export_t, 12, sum, fill = NA)),
+         jump = gap12 - lag(gap12, 12))
+calm <- bm_roll %>% filter(year %in% 2014:2016, !is.na(jump))
+X <- mean(calm$jump) + 2 * sd(calm$jump)
+bm_roll <- bm_roll %>% mutate(signal = jump > X)
+episodes <- bm_roll %>% filter(signal %in% TRUE) %>% mutate(run = cumsum(c(1, diff(as.numeric(date)) > 100))) %>%   # one quiet month does not end a period
+  group_by(run) %>% summarise(from = min(date), to = max(date), peak = max(jump), .groups = "drop")
+gap_latest <- tail(filter(bm_roll, !is.na(jump)), 1)
+
+knitr::kable(gap_y %>% filter(year >= 2012) %>% transmute(Year = year, `Exports (t of fine gold)` = fmt(export_t, 1),
+             `Declared production (t)` = fmt(prod_t, 1), `Gap (t)` = fmt(gap_t, 1), `Gap (% of exports)` = fmt(gap_pct, 1),
+             `Change on the year before (points)` = fmt(change, 1)),
+             caption = "Peru: gold exported minus gold declared as produced, by year (BCRP)")
+knitr::kable(episodes %>% transmute(`Red from` = format(from, "%b %Y"), `Red until` = format(to, "%b %Y"), `Largest jump (points)` = round(peak, 1)),
+             caption = paste0("KPI 2: periods when the 12 month gap was more than ", round(X, 1), " points above one year earlier"))
+write_csv(gap_y, file.path(OUT, "tableR2_peru_gold_gap.csv"))
+write_csv(bm_roll, file.path(OUT, "table_kpi2_gold_gap_monthly.csv"))
+check("BCRP: Peru gold export minus production gap 2025 (t)", gap_y$gap_t[gap_y$year == 2025], 103.0, tol = 0.1)
+log_number("pe_gap_2025_t", "Peru gold exports minus declared production, 2025", gap_y$gap_t[gap_y$year == 2025], "t", "BCRP PN38792BM, RD12978DM")
+log_number("pe_gap_2025_pct", "Peru gold gap as share of exports, 2025", gap_y$gap_pct[gap_y$year == 2025], "%", "BCRP")
+log_number("pe_gap_2017_pct", "Peru gold gap as share of exports, 2017", gap_y$gap_pct[gap_y$year == 2017], "%", "BCRP")
+log_number("pe_gap_h1_2026_pct", "Peru gold gap as share of exports, Jan to Jun 2026", h1_26$pct, "%", "BCRP")
+log_number("pe_gap_12m_latest", paste("Peru 12 month gold gap,", format(gap_latest$date, "%b %Y")), gap_latest$gap12, "%", "BCRP")
+log_number("pe_gap_jump_latest", paste("Peru 12 month gold gap, change on one year earlier,", format(gap_latest$date, "%b %Y")), gap_latest$jump, "points", "BCRP")
+log_number("pe_gap_X", "KPI 2 red line: jump in the 12 month gap (2014 to 2016 mean + 2 SD)", X, "points", "BCRP")
+for (i in seq_len(nrow(episodes))) log_number(paste0("pe_gap_episode_", i), "KPI 2: first month of a red period (yyyymm)", as.numeric(format(episodes$from[i], "%Y%m")), "yyyymm", "BCRP")
+```
+
+```{r fig-kpi2, fig.height = 5.5}
+k2a <- ggplot(filter(bm_roll, date >= as.Date("2013-01-01")), aes(date, gap12)) +
+  annotate("rect", xmin = as.Date("2021-01-01"), xmax = as.Date("2023-12-31"), ymin = -Inf, ymax = Inf, fill = col_soft, alpha = 0.15) +
+  geom_line(colour = col_main, linewidth = 0.9) +
+  labs(title = "Share of exported gold that is not in declared production (12 months)", x = NULL, y = "% of exports")
+k2b <- ggplot(filter(bm_roll, date >= as.Date("2014-01-01")), aes(date, jump)) +
+  annotate("rect", xmin = as.Date("2021-01-01"), xmax = as.Date("2023-12-31"), ymin = -Inf, ymax = Inf, fill = col_soft, alpha = 0.15) +
+  geom_hline(yintercept = 0, colour = col_grey) +
+  geom_hline(yintercept = X, colour = col_alert, linetype = "dashed") +
+  geom_line(colour = col_main, linewidth = 0.9) +
+  geom_point(data = filter(bm_roll, signal %in% TRUE), colour = col_alert, size = 1.5) +
+  labs(title = paste0("KPI 2: change on one year earlier (points). Red line: ", round(X, 1), " points"),
+       x = NULL, y = "points", caption = "Shaded: Madre de Dios surge. Source: BCRP series PN38792BM (exports) and RD12978DM (production). Our calculation.")
+(k2a / k2b) & scale_x_date(date_breaks = "2 years", date_labels = "%Y")
+ggsave(file.path(OUT, "figR_peru_gold_gap.png"), width = 9, height = 5.5, dpi = 200, bg = "white")
+```
+
+**[Description]** Peru exported
+`r fmt(gap_y$gap_t[gap_y$year == 2025], 1)` t more gold in 2025 than it
+declared as produced: `r round(gap_y$gap_pct[gap_y$year == 2025])`% of
+all exported gold. In 2017 it was
+`r round(gap_y$gap_pct[gap_y$year == 2017])`%. In January to June 2026
+it was `r round(h1_26$pct)`%. (The Instituto Peruano de Economía
+publishes a similar estimate: 54% in the first half of 2026, from press
+reports.)
+
+The red line is a jump of more than `r round(X, 1)` points. The gap
+jumped above it in `r nrow(episodes)` periods:
+`r paste0(format(episodes$from, "%b %Y"), " to ", format(episodes$to, "%b %Y"), collapse = " and ")`.
+The second period started in
+**`r format(episodes$from[nrow(episodes)], "%B %Y")`**, in the first year
+of the Madre de Dios surge. BCRP publishes each month about two months
+later, so FZS could have seen it in mid 2021. The yearly maps showed the
+surge only in March 2023. The first period (2017 and 2018) came without
+a surge in forest loss, so the rule can also give a warning that is not
+followed by more mining. **Today the gap is high
+(`r round(gap_latest$gap12)`% over the 12 months to
+`r format(gap_latest$date, "%B %Y")`) but it is not jumping**
+(`r sprintf("%+.1f", gap_latest$jump)` points on a year earlier), so
+KPI 2 is not red.
+
+**What it does not show.** Where the gold was mined. The gap is
+national: it includes Madre de Dios, but also Puno, La Libertad and
+other regions, and gold smuggled into Peru from neighbouring countries.
+The 2014 to 2016 calm period is our choice, and it has only 36 months
+(which overlap, because each one covers 12 months). With another
+choice, the red line would move.
+
+## KPI 3 (now, quarterly): new mining in FZS landscapes
+
+**Why.** FZS needs to know **where** mining is happening, and fast.
+Amazon Mining Watch updates its data within days after each quarter
+ends. We count new mining in hectares (from the scar map) and in patches
+(from the detections), in four FZS landscapes in Madre de Dios:
+
+- inside the **Tambopata National Reserve**, where mining is always
+  illegal;
+- the **Tambopata buffer zone** (it overlaps the Bahuaja-Sonene buffer
+  zone; we count the shared land once, as Tambopata);
+- the **Amarakaeri buffer zone**;
+- **native communities** (all titled communities outside reserves; they
+  can overlap buffer zones).
+
+**Red lines.**
+
+- **Inside the reserve:** a quarter with more new mining than the
+  largest *whole year* of 2019 to 2024. Some mining appears inside the
+  reserve every year, so "any mining" would always be red. We compare
+  with the worst year instead.
+- **Buffer zones and native communities:** the quarters of this year so
+  far have more than **25% more** new mining than the same quarters last
+  year. We compare the same quarters because mining is seen mostly in
+  the dry season (Q2 and Q3), and Q1 is very cloudy.
+
+```{r kpi3-patches}
+# Which protected area, buffer zone and native community each detection falls in.
+# We keep ALL names a point falls in (polygons overlap).
+names_in <- function(p, poly) sapply(st_intersects(p, poly), function(i) paste(sort(unique(poly$anp_nomb[i])), collapse = "|"))
+pts$anp_names <- names_in(pts, anp_v)
+pts$za_names  <- names_in(pts, za_v)
+pts$in_cn     <- lengths(st_intersects(pts, cn_v)) > 0
+pts <- pts %>% mutate(
+  tamb_reserve = grepl("Tambopata", anp_names),
+  tamb_buffer  = anp_names == "" & grepl("Tambopata|Bahuaja-Sonene", za_names),
+  amar_buffer  = anp_names == "" & !tamb_buffer & grepl("Amarakaeri", za_names),
+  native_any   = anp_names == "" & in_cn)
+
+amw_tab <- pts %>% st_drop_geometry() %>% filter(period != "2018") %>%   # 2018 = everything already there in the first year
+  count(period, category) %>% pivot_wider(names_from = category, values_from = n, values_fill = 0) %>%
+  mutate(Total = rowSums(across(where(is.numeric)))) %>% arrange(period) %>%
+  select(period, any_of(c("Protected area", "Buffer zone", "Native community", "Rest of Madre de Dios")), Total)
+write_csv(amw_tab, file.path(OUT, "table3_amw_by_category.csv"))
+
+watch <- c("Tambopata (inside reserve)", "Tambopata buffer zone", "Amarakaeri buffer zone",
+           "Native communities (all)", "All Madre de Dios")
+flag_long <- pts %>% st_drop_geometry() %>%
+  transmute(period, `Tambopata (inside reserve)` = tamb_reserve, `Tambopata buffer zone` = tamb_buffer,
+            `Amarakaeri buffer zone` = amar_buffer, `Native communities (all)` = native_any, `All Madre de Dios` = TRUE) %>%
+  pivot_longer(-period, names_to = "landscape", values_to = "flag") %>% filter(flag)
+patches_q <- flag_long %>% filter(period != "2018") %>% count(landscape, period) %>%
+  complete(landscape = watch, period = unique(pts$period[pts$period != "2018"]), fill = list(n = 0))
+```
+
+```{r kpi3-hectares}
+ha_long <- scar %>% filter(mdd, period != "2018") %>%
+  transmute(period, ha, `Tambopata (inside reserve)` = tamb_res, `Tambopata buffer zone` = !anp_any & za_tb,
+            `Amarakaeri buffer zone` = !anp_any & !za_tb & za_am, `Native communities (all)` = !anp_any & cn,
+            `All Madre de Dios` = TRUE) %>%
+  pivot_longer(-c(period, ha), names_to = "landscape", values_to = "flag") %>% filter(flag) %>%
+  group_by(landscape, period) %>% summarise(ha = sum(ha), .groups = "drop") %>%
+  complete(landscape = watch, period = unique(scar$period[scar$period != "2018"]), fill = list(ha = 0))
+
+# One table: hectares and patches by landscape and period; "Rest of Madre de Dios" = all minus the three landscapes
+k3 <- ha_long %>% left_join(patches_q, c("landscape", "period")) %>% mutate(n = replace_na(n, 0))
+rest <- k3 %>% group_by(period) %>%
+  summarise(ha = ha[landscape == "All Madre de Dios"] - sum(ha[landscape %in% watch[1:3]]),
+            n  = n[landscape == "All Madre de Dios"]  - sum(n[landscape %in% watch[1:3]]), .groups = "drop") %>%
+  mutate(landscape = "Rest of Madre de Dios")
+watch6 <- c(watch, "Rest of Madre de Dios")
+k3 <- bind_rows(k3, rest) %>% mutate(landscape = factor(landscape, watch6), quarterly = grepl("Q", period))
+write_csv(k3, file.path(OUT, "table3b_kpi3_hectares_patches.csv"))
+
+knitr::kable(k3 %>% filter(quarterly) %>% transmute(landscape, period, ha = fmt(ha)) %>%
+               pivot_wider(names_from = period, values_from = ha) %>% arrange(landscape) %>% rename(Landscape = landscape),
+             caption = "New mining per quarter, hectares (provisional). Rows overlap: native communities also lie in buffer zones.")
+knitr::kable(k3 %>% filter(quarterly) %>% transmute(landscape, period, n) %>%
+               pivot_wider(names_from = period, values_from = n) %>% arrange(landscape) %>% rename(Landscape = landscape),
+             caption = "The same, in patches (squares of about 23 ha)")
+
+# Red line inside the reserve: a quarter above the largest whole year 2019 to 2024
+res_years <- k3 %>% filter(landscape == "Tambopata (inside reserve)", period %in% as.character(2019:2024))
+reserve_base_ha <- max(res_years$ha); reserve_base_n <- max(res_years$n)
+reserve_q <- k3 %>% filter(landscape == "Tambopata (inside reserve)", quarterly) %>% arrange(period) %>%
+  mutate(red = ha > reserve_base_ha)
+first_reserve_red <- reserve_q$period[reserve_q$red][1]
+
+# Red line for buffer zones and native communities: this year so far vs the same quarters last year
+q_now  <- paste("2026", c("Q1", "Q2", "Q3")); q_last <- paste("2025", c("Q1", "Q2", "Q3"))
+ytd <- k3 %>% group_by(landscape) %>%
+  summarise(ha25 = sum(ha[period %in% q_last]), ha26 = sum(ha[period %in% q_now]),
+            n25 = sum(n[period %in% q_last]), n26 = sum(n[period %in% q_now]), .groups = "drop") %>%
+  mutate(change = 100 * (ha26 / ha25 - 1),
+         red = case_when(landscape == "Tambopata (inside reserve)" ~ any(reserve_q$red & grepl("2026", reserve_q$period)),
+                         landscape %in% watch[2:4] ~ change > 25, TRUE ~ NA))
+knitr::kable(ytd %>% transmute(Landscape = landscape, `Q1 to Q3 2025 (ha)` = fmt(ha25), `Q1 to Q3 2026 (ha)` = fmt(ha26),
+                               `Change` = pct(change), `Patches 2025` = fmt(n25), `Patches 2026` = fmt(n26),
+                               `Red?` = if_else(is.na(red), "no red line", if_else(red, "RED", "no"))),
+             caption = "KPI 3 today: the first three quarters of 2026 against the same quarters of 2025")
+write_csv(ytd, file.path(OUT, "table3c_kpi3_today.csv"))
+
+yv <- function(l, v) ytd[[v]][ytd$landscape == l]
+res25 <- sum(k3$ha[k3$landscape == "Tambopata (inside reserve)" & grepl("^2025", k3$period)])
+log_number("k3_res_ha_2025", "AMW new scar inside Tambopata National Reserve, 2025 (4 provisional quarters)", res25, "ha", "AMW scar map + SERNANP")
+log_number("k3_res_base_ha", "AMW new scar inside Tambopata National Reserve, largest whole year 2019 to 2024", reserve_base_ha, "ha", "AMW scar map + SERNANP")
+log_number("k3_res_base_n", "AMW detections inside Tambopata National Reserve, largest whole year 2019 to 2024", reserve_base_n, "patches", "AMW + SERNANP")
+log_number("k3_res_q2_2026", "AMW new scar inside Tambopata National Reserve, 2026 Q2 (provisional)", reserve_q$ha[reserve_q$period == "2026 Q2"], "ha", "AMW scar map + SERNANP")
+log_number("k3_first_red", "KPI 3 reserve red line first crossed (yyyyq)", as.numeric(gsub(" Q", "", first_reserve_red)), "yyyyq", "AMW scar map + SERNANP")
+for (l in watch6) {
+  id <- gsub("[^a-z]", "", tolower(l))
+  log_number(paste0("k3_ha25_", id), paste("AMW new scar,", l, "Q1 to Q3 2025"), yv(l, "ha25"), "ha", "AMW scar map + SERNANP")
+  log_number(paste0("k3_ha26_", id), paste("AMW new scar,", l, "Q1 to Q3 2026"), yv(l, "ha26"), "ha", "AMW scar map + SERNANP")
+  log_number(paste0("k3_n25_", id), paste("AMW detections,", l, "Q1 to Q3 2025"), yv(l, "n25"), "patches", "AMW + SERNANP")
+  log_number(paste0("k3_n26_", id), paste("AMW detections,", l, "Q1 to Q3 2026"), yv(l, "n26"), "patches", "AMW + SERNANP")
+  log_number(paste0("k3_chg_", id), paste("AMW new scar,", l, "Q1 to Q3 2026 vs 2025"), yv(l, "change"), "%", "AMW scar map + SERNANP")
+}
+```
+
+**[Description]** In the first three quarters of 2026, Amazon Mining
+Watch mapped **`r fmt(yv("Tambopata (inside reserve)", "ha26"))` ha of
+new mining inside the Tambopata National Reserve**
+(`r yv("Tambopata (inside reserve)", "n26")` patches), against
+`r fmt(yv("Tambopata (inside reserve)", "ha25"))` ha
+(`r yv("Tambopata (inside reserve)", "n25")` patches) in the same
+quarters of 2025. In 2019 to 2024 the most in any whole year was
+`r fmt(reserve_base_ha)` ha. The reserve red line was first crossed in
+**`r first_reserve_red`**, and it has been red in
+`r sum(reserve_q$red)` of the `r nrow(reserve_q)` quarters since. New
+mining also rose in the Tambopata buffer zone
+(`r pct(yv("Tambopata buffer zone", "change"))`), the Amarakaeri buffer
+zone (`r pct(yv("Amarakaeri buffer zone", "change"))`) and native
+communities (`r pct(yv("Native communities (all)", "change"))`), so
+all three are red. In the rest of Madre de Dios the change was
+`r pct(yv("Rest of Madre de Dios", "change"))`.
+
+**Is it real?** For 2025, yes, as far as we can check: Amazon Mining
+Watch gives `r fmt(res25)` ha inside the reserve, and MAAP #241 (Amazon
+Conservation, 12 May 2026), using very sharp 0.5 m images, reports more
+than `r pub("maap241_2025")` ha of mining deforestation inside the
+reserve in 2025, with `r pub("maap241_struct")` mining structures and
+`r pub("maap241_camps")` camps by February 2026. This is an independent
+source.
+
+**For 2026, the evidence is good but less direct.**
+
+- Amazon Mining Watch's own newsletter reports
+  `r pub("amw_panorama_h1")` ha of new mining in the reserve in the
+  first half of 2026. Our number is
+  `r fmt(sum(reserve_q$ha[reserve_q$period %in% c("2026 Q1", "2026 Q2")]))`
+  ha. This only shows that we read the data correctly (same source).
+- Global Conservation, a different organisation with its own satellite
+  monitoring, says the area with illegal mining activity inside the
+  reserve grew to about `r fmt(pub("gc_tamb_area"))` ha between October
+  2025 and June 2026 (quoted by Mongabay Latam, 27 September 2026).
+  Amazon Mining Watch gives
+  `r fmt(sum(reserve_q$ha[reserve_q$period %in% c("2025 Q4", "2026 Q1", "2026 Q2")]))`
+  ha for the same nine months. The two measure slightly different
+  things, but they agree on the size. **So the 2026 Q2 jump is supported
+  by an independent source.**
+- For 2026 Q3 the picture is unclear. SERNANP's radar system (RAMI)
+  found only `r pub("rami_tamb_julaug")` ha of forest lost inside the
+  reserve in July and August 2026 (same article), while Amazon Mining
+  Watch shows `r fmt(reserve_q$ha[reserve_q$period == "2026 Q3"])` ha in
+  Q3. RAMI counts only forest that is lost, while Amazon Mining Watch
+  counts any land seen as mining for the first time (also river banks
+  and land cleared before), so the two can differ. FZS should treat
+  2026 Q3 as provisional.
+
+**A note on hectares and patches.** A patch counts each 480 m square
+once, however little of it is mined. Hectares measure the mined area.
+Both tell the same story here, and the reserve red line is first crossed
+in the same quarter with both. We use hectares as the main number because
+they can be compared with MAAP and MapBiomas. Pietro's separate
+calculation from the same scar map (pipeline by Pietro Maran) gives the
+same hectares. This is a check of our code, not an independent check of
+the satellite data.
+
+**How much of it has a mining title?** We use Likitha's four groups,
+with the official map of mining concessions (titled or in process):
+protected area; buffer zone with no mining title; elsewhere with no
+mining title; inside a mining concession. The first three are
+"probably illegal".
+
+```{r kpi3-title}
+title_mdd <- scar %>% filter(mdd, period != "2018") %>%
+  mutate(when = case_when(code %in% 2019:2024 ~ as.character(code), grepl("^2025", period) ~ "2025 (quarters)",
+                          period %in% q_now ~ "2026 Q1 to Q3")) %>%
+  filter(!is.na(when)) %>% group_by(when, title) %>% summarise(ha = sum(ha), .groups = "drop") %>%
+  group_by(when) %>% mutate(share = 100 * ha / sum(ha)) %>% ungroup()
+title_wide <- title_mdd %>% transmute(when, title, share = round(share)) %>% pivot_wider(names_from = title, values_from = share, values_fill = 0) %>%
+  mutate(`Probably illegal (groups 1 to 3)` = 100 - `4 Inside a mining concession`)
+knitr::kable(title_wide %>% rename(Period = when), caption = "Madre de Dios: share of new mining hectares in each group (%). Today's concession map is used for every year.")
+write_csv(title_mdd, file.path(OUT, "table3e_kpi3_mining_title.csv"))
+noti <- function(w) 100 - title_wide$`4 Inside a mining concession`[title_wide$when == w]
+log_number("k3_notitle_1924", "Share of new mining hectares in Madre de Dios with no mining title, 2019 to 2024 average of yearly shares", mean(sapply(as.character(2019:2024), noti)), "%", "AMW scar map + SERNANP + INGEMMET")
+log_number("k3_notitle_2026", "Share of new mining hectares in Madre de Dios with no mining title, 2026 Q1 to Q3", noti("2026 Q1 to Q3"), "%", "AMW scar map + SERNANP + INGEMMET")
+```
+
+**[Description]** In 2019 to 2024, about
+`r round(mean(sapply(as.character(2019:2024), noti)))`% of new mining
+hectares in Madre de Dios had no mining title. In the first three
+quarters of 2026 it was `r round(noti("2026 Q1 to Q3"))`%. Two warnings:
+we use **today's** concession map for every year (a concession granted
+in 2024 makes 2019 mining on that land look titled), and "no title" is
+not proof that mining is illegal. Mining inside a concession is not
+proof that it is legal either.
+
+### Maps: where the new mining is
+
+```{r maps-setup}
+xy <- st_coordinates(pts); pts$x <- xy[, 1]; pts$y <- xy[, 2]
+se_box <- st_as_sfc(st_bbox(c(xmin = -72.6, ymin = -13.7, xmax = -68.5, ymax = -9.7), crs = 4326))
+zones_sf <- bind_rows(za_v %>% transmute(zone = "Buffer zone"), anp_v %>% transmute(zone = "Protected area"),
+                      cn_v %>% transmute(zone = "Native community")) %>%
+  filter(lengths(st_intersects(., se_box)) > 0) %>%
+  mutate(zone = factor(zone, c("Buffer zone", "Protected area", "Native community")))
+map_base <- list(
+  geom_sf(data = dep1, fill = "#F4F4F1", colour = "grey80", linewidth = 0.3),
+  geom_sf(data = mdd_poly, fill = "white", colour = "grey30", linewidth = 0.5),
+  geom_sf(data = zones_sf, aes(fill = zone, colour = zone), linewidth = 0.3),
+  scale_fill_manual(values = c("Buffer zone" = "#E3F1DF", "Protected area" = "#A9D49A", "Native community" = "#EBDDEB"), name = NULL),
+  scale_colour_manual(values = c("Buffer zone" = "#8DBF83", "Protected area" = "#3E8E41", "Native community" = "#B07AA1"), guide = "none"))
+anp_labels <- suppressWarnings(anp_v %>% filter(anp_nomb %in% c("Tambopata", "Amarakaeri", "Bahuaja-Sonene", "del Manu", "Alto Purús")) %>%
+  group_by(anp_nomb) %>% summarise() %>% st_intersection(st_geometry(mdd_poly)) %>% st_point_on_surface())
+zx <- c(-70.8, -68.95); zy <- c(-13.3, -12.2)
+pp <- st_drop_geometry(pts)
+```
+
+```{r map-overview, fig.width = 8.5, fig.height = 8.5}
+pp <- pp %>% mutate(recent = if_else(grepl("2[56]$", onset), "New in 2025 and 2026", "First seen 2018 to 2024"))
+ggplot() + map_base +
+  geom_point(data = filter(pp, recent != "New in 2025 and 2026"), aes(x, y), colour = "grey35", size = 0.3, alpha = 0.4) +
+  geom_point(data = filter(pp, recent == "New in 2025 and 2026"), aes(x, y), colour = col_alert, size = 0.5) +
+  geom_sf_text(data = anp_labels, aes(label = anp_nomb), size = 3, colour = "#1E5A20", fontface = "bold") +
+  annotate("rect", xmin = zx[1], xmax = zx[2], ymin = zy[1], ymax = zy[2], fill = NA, colour = "grey20", linetype = "dashed") +
+  coord_sf(xlim = c(-72.5, -68.6), ylim = c(-13.6, -9.8), expand = FALSE) + theme_void() + theme(legend.position = "bottom") +
+  labs(title = "Madre de Dios: mining detections, protected areas, buffer zones and native communities",
+       subtitle = "Grey: first seen 2018 to 2024. Red: new in 2025 and 2026. Dashed box: area of the next two maps.",
+       caption = "Sources: Amazon Mining Watch (3 Oct 2026); SERNANP; GADM 4.1.")
+ggsave(file.path(OUT, "map1_overview.png"), width = 8.5, height = 8.5, dpi = 200, bg = "white")
+```
+
+```{r map-periods, fig.width = 11, fig.height = 6.5}
+periods <- c("2019 and 2020", "2021 to 2023 (surge)", "2024", "2025", "2026 (Q1 to Q3)")
+pp2 <- pp %>% mutate(when = case_when(onset %in% c("2019", "2020") ~ periods[1], onset %in% c("2021", "2022", "2023") ~ periods[2],
+                                      onset == "2024" ~ periods[3], grepl("25$", onset) ~ periods[4], grepl("26$", onset) ~ periods[5])) %>%
+  filter(!is.na(when)) %>% mutate(when = factor(when, periods)) %>% add_count(when) %>%
+  mutate(panel = factor(paste0(when, "  (", n, " patches)"))) %>% mutate(panel = fct_reorder(panel, as.numeric(when)))
+ggplot() + map_base + geom_point(data = pp2, aes(x, y), colour = "black", size = 0.35) +
+  facet_wrap(~panel, nrow = 2) + coord_sf(xlim = zx, ylim = zy, expand = FALSE) + theme_void() +
+  theme(strip.text = element_text(face = "bold", size = 10), legend.position = "bottom") +
+  labs(title = "What changed: new mining patches by period (Tambopata and Amarakaeri area)",
+       subtitle = "Each dot is a patch where mining was seen for the first time in that period",
+       caption = "Source: Amazon Mining Watch; SERNANP boundaries. 2025 and 2026 quarters are provisional.")
+ggsave(file.path(OUT, "map2_periods.png"), width = 11, height = 6.5, dpi = 200, bg = "white")
+
+shift <- pp2 %>% mutate(fzs = category %in% c("Protected area", "Buffer zone")) %>% group_by(when) %>%
+  summarise(patches = n(), `in reserves or buffer zones` = sum(fzs), `share (%)` = round(100 * mean(fzs)), .groups = "drop")
+knitr::kable(shift, caption = "Share of new patches inside protected areas or buffer zones, by period")
+write_csv(shift, file.path(OUT, "table3d_amw_shift.csv"))
+log_number("shift_surge", "Share of new AMW patches in reserves or buffer zones, 2021 to 2023", shift$`share (%)`[shift$when == periods[2]], "%", "Amazon Mining Watch + SERNANP")
+log_number("shift_2026", "Share of new AMW patches in reserves or buffer zones, 2026 Q1 to Q3", shift$`share (%)`[shift$when == periods[5]], "%", "Amazon Mining Watch + SERNANP")
+```
+
+```{r map-change, fig.width = 10, fig.height = 6.5}
+cell <- 0.05   # about 5.5 km
+grid <- pp %>% filter(onset %in% c("Q125", "Q225", "Q325", "Q126", "Q226", "Q326")) %>%
+  mutate(yr = if_else(grepl("26$", onset), "y2026", "y2025"), cx = floor(x / cell) * cell + cell / 2, cy = floor(y / cell) * cell + cell / 2) %>%
+  count(cx, cy, yr) %>% pivot_wider(names_from = yr, values_from = n, values_fill = 0) %>% mutate(change = y2026 - y2025) %>%
+  filter(change != 0)   # cells with no change are not drawn
+ggplot() + map_base +
+  geom_point(data = grid, aes(cx, cy, size = abs(change), colour = if_else(change > 0, "More than a year earlier", "Fewer than a year earlier")),
+             shape = 15, alpha = 0.85) +
+  scale_colour_manual(values = c("More than a year earlier" = col_alert, "Fewer than a year earlier" = "#2E86C1"), name = NULL) +
+  scale_size_area(max_size = 6, name = "Change (patches)") +
+  coord_sf(xlim = zx, ylim = zy, expand = FALSE) + theme_void() + theme(legend.position = "bottom") +
+  labs(title = "Change map: new patches in Q1 to Q3 2026 minus Q1 to Q3 2025, per cell of about 5 km",
+       subtitle = "Red squares: more new patches than in the same quarters of 2025. Blue: fewer. Size = size of the change.",
+       caption = "Source: Amazon Mining Watch (provisional quarters); SERNANP boundaries.")
+ggsave(file.path(OUT, "map3_change.png"), width = 10, height = 6.5, dpi = 200, bg = "white")
+```
+
+**[Description]** The share of new patches inside protected areas or
+buffer zones rose from `r shift$"share (%)"[shift$when == periods[2]]`%
+during the 2021 to 2023 surge to
+`r shift$"share (%)"[shift$when == periods[5]]`% in the first three
+quarters of 2026. New mining is moving south, towards the Tambopata
+buffer zone and reserve.
+
+```{r fig-kpi3, fig.height = 4.2}
+k3 %>% filter(quarterly, landscape %in% watch6[c(1:4, 6)]) %>%
+  ggplot(aes(period, ha, fill = grepl("2026", period))) + geom_col() +
+  geom_hline(data = tibble(landscape = factor("Tambopata (inside reserve)", watch6), y = reserve_base_ha), aes(yintercept = y),
+             colour = col_alert, linetype = "dashed") +
+  facet_wrap(~landscape, scales = "free_y", nrow = 2) +
+  scale_fill_manual(values = c(`FALSE` = col_grey, `TRUE` = col_alert), guide = "none") +
+  labs(title = "KPI 3: new mining per quarter, hectares (2026 in red)",
+       subtitle = "Dashed line in the reserve panel: largest whole year 2019 to 2024. Note the different scales.",
+       x = NULL, y = "ha", caption = "Source: Amazon Mining Watch scar map (provisional quarters); SERNANP.") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+ggsave(file.path(OUT, "fig_kpi3_quarters.png"), width = 9, height = 4.2, dpi = 200, bg = "white")
+```
+
+**What it does not show.** Mining again inside old pits (Amazon Mining
+Watch counts land only the first time), dredges on rivers (the model
+ignores them), and legality. The quarters are provisional and can be
+revised. Amazon Mining Watch rebuilt its model in 2026 and replaces its
+files, so FZS cannot see what the data said in the past: it should save
+a copy every quarter.
+
+## KPI 4 (late, yearly): forest that became mining
+
+**Why.** This is the trusted yearly number for donors. It comes from
+MapBiomas Peru, which maps all of Peru every year since 1985. We count
+only **forest that became mining**, for the reason explained in Section
+3. We show two lines:
+
+- **Inside reserves and buffer zones**: four FZS landscapes (Tambopata,
+  Amarakaeri, Bahuaja-Sonene and Manu), inside the reserves and in their
+  buffer zones. This includes the parts outside Madre de Dios
+  (Bahuaja-Sonene in Puno, part of Amarakaeri in Cusco). Inside a
+  reserve mining is always illegal. In a buffer zone it needs SERNANP's
+  approval.
+- **All of Madre de Dios.**
+
+**Red line: this year is above the average of the previous five years
+plus two standard deviations.** This is a standard "control chart" rule:
+a value so far above the recent past that normal ups and downs do not
+explain it.
+
+```{r kpi4}
+control <- function(d) d %>% arrange(year) %>%
+  mutate(mean5 = rollapplyr(lag(ha), 5, mean, fill = NA), sd5 = rollapplyr(lag(ha), 5, sd, fill = NA),
+         limit = mean5 + 2 * sd5, red = ha > limit)
+landscapes <- c("Tambopata", "Amarakaeri", "Bahuaja-Sonene", "del Manu")
+ff_by <- function(tr, label) tr %>% filter(unit %in% landscapes, class_to == MINING, class_from %in% FOREST) %>%
+  group_by(year) %>% summarise(ha = sum(ha), .groups = "drop") %>% mutate(zone = label)
+k4 <- bind_rows(ff_by(tr_anp, "Inside the reserves"), ff_by(tr_za, "Buffer zones"),
+                flows %>% transmute(year, ha = from_forest, zone = "All Madre de Dios")) %>%
+  filter(year >= 2001) %>% group_by(zone) %>% group_modify(~ control(.x)) %>% ungroup() %>%
+  mutate(zone = factor(zone, c("Inside the reserves", "Buffer zones", "All Madre de Dios")))
+knitr::kable(k4 %>% filter(year >= 2016) %>% transmute(year, zone, txt = paste0(fmt(ha), " (", fmt(limit), ")", if_else(red %in% TRUE, " RED", ""))) %>%
+               pivot_wider(names_from = zone, values_from = txt) %>% select(Year = year, all_of(levels(k4$zone))),
+             caption = "KPI 4: forest that became mining, ha (red line in brackets). Reserves and buffer zones: Tambopata, Amarakaeri, Bahuaja-Sonene and Manu.")
+write_csv(k4, file.path(OUT, "table4_kpi4_forest_to_mining.csv"))
+k4v <- function(z, y, v = "ha") k4[[v]][k4$zone == z & k4$year == y]
+red_years <- function(z) paste(k4$year[k4$zone == z & k4$red %in% TRUE & k4$year >= 2016], collapse = ", ")
+for (z in levels(k4$zone)) {
+  id <- c("Inside the reserves" = "res", "Buffer zones" = "za", "All Madre de Dios" = "mdd")[z]
+  log_number(paste0("k4_", id, "_2025"), paste("Forest to mining, 2025,", z), k4v(z, 2025), "ha", "MapBiomas C4 transitions")
+  log_number(paste0("k4_", id, "_lim_2025"), paste("KPI 4 red line, 2025,", z), k4v(z, 2025, "limit"), "ha", "MapBiomas C4 transitions")
+}
+tamb_in <- cov_anp %>% filter(unit == "Tambopata", department == "Madre de Dios", class == MINING) %>% group_by(year) %>% summarise(ha = sum(ha))
+log_number("tamb_anp_2025", "Mining area inside Tambopata National Reserve, 2025", tamb_in$ha[tamb_in$year == 2025], "ha", "MapBiomas C4 ANP")
+log_number("tamb_anp_base", "Mining area inside Tambopata National Reserve, mean 2016 to 2020", mean(tamb_in$ha[tamb_in$year %in% 2016:2020]), "ha", "MapBiomas C4 ANP")
+```
+
+```{r fig-kpi4, fig.height = 3.8}
+ggplot(filter(k4, year >= 2010), aes(year, ha)) +
+  geom_col(aes(fill = red %in% TRUE)) +
+  geom_line(aes(y = limit), colour = col_alert, linetype = "dashed") +
+  facet_wrap(~zone, scales = "free_y") +
+  scale_fill_manual(values = c(`FALSE` = col_main, `TRUE` = col_alert), guide = "none") +
+  scale_y_continuous(labels = scales::comma) + scale_x_continuous(breaks = seq(2010, 2025, 5)) +
+  labs(title = "KPI 4: forest that became mining (ha per year)",
+       subtitle = "Red bars: above the previous 5 year average + 2 standard deviations (dashed line)", x = NULL, y = "ha",
+       caption = "Source: MapBiomas Peru Collection 4, transitions.")
+ggsave(file.path(OUT, "fig_kpi4.png"), width = 9, height = 3.8, dpi = 200, bg = "white")
+```
+
+**[Description]** In 2025, forest that became mining was
+**`r fmt(k4v("Inside the reserves", 2025))` ha inside the reserves**
+(red line `r fmt(k4v("Inside the reserves", 2025, "limit"))` ha) and
+**`r fmt(k4v("Buffer zones", 2025))` ha in their buffer zones** (red
+line `r fmt(k4v("Buffer zones", 2025, "limit"))` ha). Both are red. Red
+years since 2016: inside the reserves `r red_years("Inside the reserves")`;
+buffer zones `r red_years("Buffer zones")`; all of Madre de Dios
+`r red_years("All Madre de Dios")`.
+
+**An honest limit of the rule.** In all of Madre de Dios, 2025 was the
+**highest year on record**
+(`r fmt(k4v("All Madre de Dios", 2025))` ha), but it is **not red**: the
+red line was `r fmt(k4v("All Madre de Dios", 2025, "limit"))` ha. The
+reason is that the red line uses the previous five years, and those
+include the surge years 2021 to 2023. After a surge, the line moves up,
+so only a new and even bigger jump is red. We double checked this with a
+second, separate calculation (in Python, straight from the MapBiomas
+file) and got the same numbers. This is why we **lead with the reserves
+and buffer zones line**: it is where FZS acts, and it turned red. FZS
+should also report the plain number every year ("highest on record"),
+not only the colour.
+
+We report hectares, not the share of all new mining. During the surge
+the share inside FZS landscapes *fell* (the surge was mainly elsewhere
+in the department), so a share would hide growth inside them. MAAP's
+own count for January 2021 to March 2024 (MAAP #208) puts
+`r pub("maap208_outside")`% of mining deforestation outside the legal
+mining corridor: `r pub("maap208_cn")`% in native communities and
+`r pub("maap208_za")`% in buffer zones.
+
+**What it does not show.** Mining in rivers, mining again on old sites,
+mercury. It arrives late: each year's map is published 5 to 17 months
+after the year ends. MapBiomas also revises earlier years in each new
+version (Section 9).
+
+## KPI 5 (now, quarterly): is mining spreading outside Madre de Dios?
+
+**Why.** If FZS only watches Madre de Dios, it can miss a new mining
+front somewhere else in Peru. KPI 5 adds up new mining in **all of Peru
+outside Madre de Dios**, from the same scar map as KPI 3.
+
+**Red line:** the same as for buffer zones in KPI 3: this year so far
+has more than 25% more new mining than the same quarters last year.
+
+```{r kpi5}
+out_mdd <- scar %>% filter(!mdd, period != "2018") %>%
+  mutate(when = case_when(code %in% 2019:2024 ~ as.character(code), grepl("^2025", period) ~ "2025",
+                          grepl("^2026", period) ~ "2026 (Q1 to Q3)"))
+k5_dep <- out_mdd %>% group_by(department, when) %>% summarise(ha = sum(ha), .groups = "drop") %>%
+  group_by(department) %>% filter(sum(ha) >= 100) %>% ungroup()
+k5_tot <- out_mdd %>% group_by(when) %>% summarise(ha = sum(ha), .groups = "drop") %>% mutate(department = "Total outside Madre de Dios")
+knitr::kable(bind_rows(k5_dep, k5_tot) %>% mutate(ha = fmt(ha)) %>% pivot_wider(names_from = when, values_from = ha, values_fill = "0") %>%
+               rename(Department = department),
+             caption = "New mining outside Madre de Dios, ha. 2019 to 2024 confirmed; 2025 = sum of four provisional quarters; 2026 = three provisional quarters. Departments with at least 100 ha in total.")
+write_csv(bind_rows(k5_dep, k5_tot), file.path(OUT, "table5_kpi5_outside_mdd.csv"))
+
+k5_q <- out_mdd %>% filter(grepl("Q", period)) %>% group_by(period) %>% summarise(ha = sum(ha))
+k5_25 <- sum(k5_q$ha[k5_q$period %in% q_last]); k5_26 <- sum(k5_q$ha[k5_q$period %in% q_now])
+k5_change <- 100 * (k5_26 / k5_25 - 1)
+
+# Who holds the land: mining title and the El Sira buffer zone (Huánuco)
+k5_title <- out_mdd %>% filter(when %in% c("2024", "2025")) %>% group_by(when) %>%
+  summarise(titled = 100 * sum(ha[conc]) / sum(ha), sira = 100 * sum(ha[za_sira]) / sum(ha),
+            huanuco = 100 * sum(ha[department == "Huánuco"]) / sum(ha), ha = sum(ha), .groups = "drop")
+knitr::kable(k5_title %>% transmute(Year = when, `New mining outside Madre de Dios (ha)` = fmt(ha),
+                                    `in Huánuco (%)` = round(huanuco), `in the El Sira buffer zone (%)` = round(sira),
+                                    `inside a mining concession (%)` = round(titled)),
+             caption = "Where the new mining outside Madre de Dios is")
+k5v <- function(w, d = "Total outside Madre de Dios") bind_rows(k5_dep, k5_tot)$ha[bind_rows(k5_dep, k5_tot)$when == w & bind_rows(k5_dep, k5_tot)$department == d]
+log_number("k5_2019", "New mining outside Madre de Dios, 2019", k5v("2019"), "ha", "AMW scar map + GADM")
+log_number("k5_2024", "New mining outside Madre de Dios, 2024", k5v("2024"), "ha", "AMW scar map + GADM")
+log_number("k5_2025", "New mining outside Madre de Dios, 2025 (4 provisional quarters)", k5v("2025"), "ha", "AMW scar map + GADM")
+log_number("k5_huanuco_2019", "New mining in Huánuco, 2019", k5v("2019", "Huánuco"), "ha", "AMW scar map + GADM")
+log_number("k5_huanuco_2025", "New mining in Huánuco, 2025 (provisional)", k5v("2025", "Huánuco"), "ha", "AMW scar map + GADM")
+log_number("k5_ytd25", "New mining outside Madre de Dios, Q1 to Q3 2025", k5_25, "ha", "AMW scar map + GADM")
+log_number("k5_ytd26", "New mining outside Madre de Dios, Q1 to Q3 2026", k5_26, "ha", "AMW scar map + GADM")
+log_number("k5_change", "New mining outside Madre de Dios, Q1 to Q3 2026 vs 2025", k5_change, "%", "AMW scar map + GADM")
+log_number("k5_titled_2025", "Share of new mining outside Madre de Dios inside a mining concession, 2025", k5_title$titled[k5_title$when == "2025"], "%", "AMW scar map + INGEMMET")
+log_number("k5_sira_2025", "Share of new mining outside Madre de Dios in the El Sira buffer zone, 2025", k5_title$sira[k5_title$when == "2025"], "%", "AMW scar map + SERNANP")
+```
+
+```{r fig-kpi5, fig.height = 3.8}
+bind_rows(k5_dep) %>% mutate(department = fct_lump_n(department, 4, w = ha, other_level = "Other departments")) %>%
+  group_by(department, when) %>% summarise(ha = sum(ha), .groups = "drop") %>%
+  ggplot(aes(when, ha, fill = department)) + geom_col(width = 0.75) +
+  scale_fill_manual(values = c(col_alert, col_main, col_soft, "#5DADE2", col_grey), name = NULL) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "KPI 5: new mining outside Madre de Dios, by department (ha)",
+       subtitle = "Departments with at least 100 ha in total. 2019 to 2024 confirmed; 2025 and 2026 provisional (2026: Q1 to Q3 only)",
+       x = NULL, y = "ha", caption = "Source: Amazon Mining Watch scar map; GADM 4.1.")
+ggsave(file.path(OUT, "fig_kpi5.png"), width = 9, height = 3.8, dpi = 200, bg = "white")
+```
+
+**[Description]** Outside Madre de Dios, new mining went from
+`r fmt(k5v("2019"))` ha in 2019 to `r fmt(k5v("2024"))` ha in 2024, and
+`r fmt(k5v("2025"))` ha in 2025 (provisional). It is still small next to
+Madre de Dios, but it is growing. Most of the growth is in **Huánuco**
+(`r fmt(k5v("2019", "Huánuco"))` ha in 2019,
+`r fmt(k5v("2025", "Huánuco"))` ha in 2025), around the El Sira buffer
+zone near Puerto Inca. Pietro found this first. Likitha found a break
+out in the El Sira buffer zone with the detections.
+
+**Today KPI 5 is not red:** the first three quarters of 2026 had
+`r fmt(k5_26)` ha against `r fmt(k5_25)` ha a year earlier
+(`r pct(k5_change)`).
+
+**Be careful with the words.** In 2025,
+`r round(k5_title$titled[k5_title$when == "2025"])`% of the new mining
+outside Madre de Dios was **inside a mining concession** (titled or in
+process). So this is "mining spreading", **not** "illegal mining
+spreading". FZS should watch it because a new front can grow fast, and
+because the El Sira buffer zone protects a reserve.
+
+**What it does not show.** Same limits as KPI 3. Also, 2025 is the sum
+of four provisional quarters, which use a stricter rule than the
+confirmed years, so 2025 and 2024 are not exactly comparable. We have
+the concession map only for the two map zones on SERNANP's service (UTM
+zones 18 and 19), which cover all departments with mining here except
+small parts of Amazonas, Cajamarca and Piura.
+
+# How we set the red lines, and would they have warned in time?
+
+**The rules.** We used two kinds of red line. For noisy numbers with a
+long history, a statistical rule: "above the recent average plus two
+standard deviations". For short or new series, a simple rule that a
+director can check by eye: "20% above", "25% more", "more than the worst
+year". The table shows each rule and why.
+
+```{r thresholds}
+thr <- tribble(
+  ~KPI, ~`Red when`, ~`Why this rule`, ~`Today`,
+  "1 Gold price in soles", "Ratio to the 3 year average reaches 1.20",
+    "A 20% rise in real income is large for a miner; a round number is easy to check",
+    paste0(round(latest$ratio, 2), " in ", format(latest$date, "%b %Y"), if (latest$signal) ": RED" else ": not red"),
+  "2 Peru's gold gap", paste0("12 month gap more than ", round(X, 1), " points above one year earlier"),
+    "The gap is always high, so we watch jumps. X = 2014 to 2016 average change + 2 standard deviations",
+    paste0(sprintf("%+.1f", gap_latest$jump), " points in ", format(gap_latest$date, "%b %Y"), if (gap_latest$signal %in% TRUE) ": RED" else ": not red"),
+  "3 New mining in FZS landscapes (reserve)", paste0("A quarter above the largest whole year 2019 to 2024 (", fmt(reserve_base_ha), " ha)"),
+    "Some mining appears every year, so 'any mining' would always be red",
+    paste0(fmt(reserve_q$ha[reserve_q$period == "2026 Q3"]), " ha in 2026 Q3: ", if (reserve_q$red[reserve_q$period == "2026 Q3"]) "RED" else "not red"),
+  "3 New mining in FZS landscapes (buffer zones, native communities)", "Quarters so far this year 25% above the same quarters last year",
+    "Same quarters because of the dry season and clouds; 25% is a clear rise, not noise",
+    paste0("Tambopata buffer ", pct(yv("Tambopata buffer zone", "change")), ", Amarakaeri ", pct(yv("Amarakaeri buffer zone", "change")),
+           ", native communities ", pct(yv("Native communities (all)", "change")), ": RED"),
+  "4 Forest that became mining", "Above the previous 5 year average + 2 standard deviations",
+    "Standard control chart rule for a long yearly series",
+    paste0("2025: reserves and buffer zones RED; all Madre de Dios not red (record year, see KPI 4)"),
+  "5 New mining outside Madre de Dios", "Quarters so far this year 25% above the same quarters last year",
+    "Same rule as KPI 3 buffer zones",
+    paste0(pct(k5_change), ": ", if (k5_change > 25) "RED" else "not red"))
+knitr::kable(thr, caption = "The red line of each KPI")
+write_csv(thr, file.path(OUT, "table6_red_lines.csv"))
+```
+
+**The backtest.** Using only data that were public at the time, when
+would each KPI have warned FZS about the 2021 to 2023 surge? We use the
+dates when each source was first published. MapBiomas Peru presented
+Collection 1 (maps to 2021) on 3 March 2023 (reported by Panamericana
+that day), Collection 2 (to 2022) on 15 February 2024 (MapBiomas Peru's
+website), Collection 3 (to 2024) by 12 June 2025 at the latest (reported
+by Mongabay; MapBiomas press material gives 5 June), and Collection 4
+(to 2025) on 20 August 2026 (Caretas). MAAP published
+`r fmt(pub("maap185_2122"))` ha for 2021 and 2022 on 15 June 2023
+(#185), and `r fmt(pub("maap208_2123"))` ha for 2021 to 2023 on 8 May
+2024 (#208).
+
+```{r backtest}
+release <- tribble(~covers_to, ~release_date,
+                   2021, as.Date("2023-03-03"), 2022, as.Date("2024-02-15"),
+                   2024, as.Date("2025-06-12"), 2025, as.Date("2026-08-20"))   # C3: latest verified date
+first_release <- function(y) min(release$release_date[release$covers_to >= y])
+k1_first <- first_signals$date[first_signals$date >= as.Date("2019-01-01")][1]
+k2_first <- episodes$from[episodes$from >= as.Date("2019-01-01")][1]
+k4_first <- function(z) { y <- k4$year[k4$zone == z & k4$red %in% TRUE & k4$year %in% 2019:2025]; if (length(y)) y else NA }
+delay_months <- sapply(2021:2023, function(y) as.numeric(first_release(y) - as.Date(paste0(y, "-12-31"))) / 30.44)
+net_cc <- flows %>% filter(year >= 2005) %>% arrange(year) %>%
+  mutate(limit = rollapplyr(lag(net_addition), 5, mean, fill = NA) + 2 * rollapplyr(lag(net_addition), 5, sd, fill = NA),
+         red = net_addition > limit)
+net_years <- net_cc$year[net_cc$red %in% TRUE & net_cc$year %in% 2019:2024]
+mdd_years <- k4_first("All Madre de Dios"); res_years_red <- k4_first("Inside the reserves"); za_years_red <- k4_first("Buffer zones")
+
+bt <- tribble(
+  ~KPI, ~`First red (data)`, ~`Public by`, ~Comment,
+  "1 Gold price in soles", format(k1_first, "%b %Y"), format(k1_first + 35, "%b %Y"),
+     "Before the surge. Red again from late 2024, before the record year 2025",
+  "2 Peru's gold gap (jump)", format(k2_first, "%b %Y"), format(k2_first + 61, "%b %Y"),
+     "In the first year of the surge; BCRP publishes about two months later. An earlier red period (2017 and 2018) had no surge after it",
+  "3 New mining in FZS landscapes (quarterly)", first_reserve_red, "days after the quarter",
+     "Quarterly data start in 2025, so this KPI cannot be tested on the surge. The yearly detections did not rise in 2021 to 2023",
+  "4 Forest that became mining, all Madre de Dios", paste(mdd_years, collapse = ", "), format(first_release(min(mdd_years)), "%d %b %Y"),
+     paste0("The surge years were first mapped ", round(min(delay_months)), " to ", round(max(delay_months)), " months after each year ended"),
+  "4 Forest that became mining, reserves / buffer zones", paste0(paste(res_years_red, collapse = ", "), " / ", paste(za_years_red, collapse = ", ")),
+     format(first_release(min(c(res_years_red, za_years_red), na.rm = TRUE)), "%d %b %Y"), "Inside the reserves from 2023; buffer zones in 2025",
+  "5 New mining outside Madre de Dios", "not red", "days after the quarter", "Quarterly data start in 2025; cannot be tested on the surge",
+  "For reference: MAAP mining deforestation", paste0("2021 and 2022: ", fmt(pub("maap185_2122")), " ha"), "15 Jun 2023",
+     "No single year 2023 figure published; we do not subtract totals from different reports",
+  "For reference: net addition (same rule as KPI 4)", paste(net_years, collapse = ", "), format(first_release(min(net_years)), "%d %b %Y"), "Pushed up in 2023 by water relabelled as mining")
+knitr::kable(bt, caption = "Backtest: when each KPI would first have turned red, and when the data were public")
+write_csv(bt, file.path(OUT, "table7_backtest.csv"))
+```
+
+```{r revisions, include = FALSE}
+c4_peru_2022 <- cov_pol %>% filter(class == MINING, year == 2022) %>% pull(ha) %>% sum()
+c4_mdd_2022  <- mdd_level$mining_ha[mdd_level$year == 2022]
+log_number("c4_peru_2022", "Mining area, Peru, 2022, as revised in Collection 4", c4_peru_2022, "ha", "MapBiomas C4")
+log_number("c4_mdd_2022", "Mining area, Madre de Dios, 2022, as revised in Collection 4", c4_mdd_2022, "ha", "MapBiomas C4")
+log_number("rev_mdd_2022", "Revision of Madre de Dios 2022 mining area, Collection 4 vs Collection 2", 100 * (c4_mdd_2022 / pub("c2_mdd_2022") - 1), "%", "MapBiomas C4 vs C2 (typed)")
+```
+
+**[Description]** The two early KPIs moved before the yearly maps. KPI 1
+was red from `r format(k1_first, "%B %Y")`, and KPI 2 from
+`r format(k2_first, "%B %Y")`. The yearly maps first showed the surge on
+3 March 2023.
+
+**Three cautions.**
+
+1. **We chose the rules after seeing the data.** We knew a surge
+   happened in 2021 to 2023. So the backtest shows what the rules
+   *would* have done; it does not prove they work. The fair test is the
+   next two years.
+2. **We use today's numbers with yesterday's dates.** We use Collection
+   4 values with the release dates of earlier collections, because
+   earlier Madre de Dios figures are not in a downloadable table. Each
+   collection revises earlier years: for 2022, Collection 2 reported
+   about `r fmt(pub("c2_mdd_2022"))` ha of mining in Madre de Dios, and
+   Collection 4 now reports `r fmt(c4_mdd_2022)` ha
+   (`r sprintf("%+.0f", 100*(c4_mdd_2022/pub("c2_mdd_2022")-1))`%). So
+   the backtest shows timing, not the exact values FZS would have seen.
+3. **The early KPIs also give warnings with no surge after them**
+   (KPI 2 in 2017 and 2018). An early signal means "get ready", not
+   "mining will rise".
+
+# Main figure for the brief
+
+```{r main-figure, fig.height = 10}
+lims <- as.Date(c("2016-01-01", "2026-12-31"))
+surge <- annotate("rect", xmin = as.Date("2021-01-01"), xmax = as.Date("2023-12-31"), ymin = -Inf, ymax = Inf, fill = col_soft, alpha = 0.12)
+p1 <- ggplot(filter(gold, date >= lims[1]), aes(date, ratio)) + surge +
+  geom_hline(yintercept = 1.2, colour = col_alert, linetype = "dashed") +
+  geom_line(colour = col_main, linewidth = 0.8) +
+  labs(title = "A  KPI 1, early (monthly): gold price in soles / its 3 year average. Red line: 1.20", x = NULL, y = "Ratio")
+p2 <- ggplot(filter(bm_roll, date >= lims[1]), aes(date, jump)) + surge +
+  geom_hline(yintercept = X, colour = col_alert, linetype = "dashed") + geom_hline(yintercept = 0, colour = col_grey) +
+  geom_line(colour = col_main, linewidth = 0.8) +
+  labs(title = paste0("B  KPI 2, early (monthly): jump in Peru's gold gap, points. Red line: ", round(X, 1)), x = NULL, y = "points")
+delay <- k4 %>% filter(zone == "All Madre de Dios", year >= 2016) %>%
+  mutate(end = as.Date(paste0(year, "-12-31")), public = sapply(year, first_release) %>% as.Date(origin = "1970-01-01"))
+p3 <- ggplot(delay) + surge +
+  geom_rect(aes(xmin = as.Date(paste0(year, "-01-15")), xmax = as.Date(paste0(year, "-12-15")), ymin = 0, ymax = ha, fill = red %in% TRUE)) +
+  geom_segment(data = filter(delay, year >= 2020), aes(x = end, xend = public, y = ha, yend = ha), colour = "grey35", linetype = "dotted") +
+  geom_point(data = filter(delay, year >= 2020), aes(public, ha), shape = 21, fill = "white", size = 2.2) +
+  scale_fill_manual(values = c(`FALSE` = col_main, `TRUE` = col_alert), guide = "none") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "C  KPI 4, late (yearly): forest that became mining in Madre de Dios, ha",
+       subtitle = "Red = above its red line. Dotted line and circle: date the year's map was first published.", x = NULL, y = "ha")
+q_plot <- k3 %>% filter(quarterly, landscape %in% watch[1:3]) %>%
+  mutate(date = as.Date(sprintf("%s-%02d-15", substr(period, 1, 4), 3 * as.integer(substr(period, 7, 7)) - 1)),
+         landscape = droplevels(landscape))
+p4 <- ggplot(q_plot, aes(date, ha, fill = landscape)) +
+  geom_col(width = 80) +
+  scale_fill_manual(values = c("Tambopata (inside reserve)" = col_alert, "Tambopata buffer zone" = col_soft, "Amarakaeri buffer zone" = col_grey)) +
+  annotate("text", x = as.Date("2024-09-01"), y = max(q_plot$ha) * 0.6, label = "quarterly data\nstart in 2025", hjust = 1, size = 3, colour = "grey40") +
+  labs(title = "D  KPI 3, now (quarterly, provisional): new mining in FZS landscapes, ha", x = NULL, y = "ha", fill = NULL)
+(p1 / p2 / p3 / p4) + plot_layout(heights = c(1, 1, 1.3, 1)) &
+  scale_x_date(limits = lims, date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) &
+  plot_annotation(title = "Early signals moved in 2020 and 2021; the yearly maps showed the surge only in March 2023",
+                  caption = "Shaded: 2021 to 2023 surge. Sources: World Bank Pink Sheet (Oct 2026); BCRP; MapBiomas Peru Collection 4; Amazon Mining Watch (3 Oct 2026); SERNANP.",
+                  theme = theme(plot.title = element_text(face = "bold", size = 12.5)))
+ggsave(file.path(OUT, "fig_main.png"), width = 9.5, height = 10, dpi = 250, bg = "white")
+```
+
+# Summary table for FZS
+
+```{r kpi-summary}
+kpi <- tribble(
+  ~KPI, ~Speed, ~`Value today`, ~Source, ~`Updated (delay)`, ~`Red when`, ~`Action when red`, ~`Does not show`,
+  "1 Gold price in soles vs its 3 year average", "Early",
+    paste0(round(latest$ratio, 2), " (", format(latest$date, "%b %Y"), "): ", if (latest$signal) "RED" else "not red"),
+    "World Bank Pink Sheet; BCRP", "Monthly (about 1 month)", "Ratio reaches 1.20",
+    "Brief partners; plan more patrols and flights for the next dry season",
+    "Where or how much mining will follow",
+  "2 Peru's gold gap (exports minus declared production)", "Early",
+    paste0(round(gap_latest$gap12), "% of exports (12 months to ", format(gap_latest$date, "%b %Y"), "); change ", sprintf("%+.1f", gap_latest$jump), " points: not red"),
+    "BCRP", "Monthly (about 2 months)", paste0("Jump of more than ", round(X, 1), " points on a year earlier"),
+    "Push buyers and ministries for gold traceability; expect more mining pressure",
+    "Where the gold was mined; includes other regions and smuggled gold",
+  "3 New mining in FZS landscapes", "Now",
+    paste0(fmt(yv("Tambopata (inside reserve)", "ha26")), " ha inside the Tambopata reserve in Q1 to Q3 2026 (", fmt(yv("Tambopata (inside reserve)", "ha25")), " ha a year earlier): RED"),
+    "Amazon Mining Watch; SERNANP", "Quarterly (days; provisional)",
+    paste0("Reserve: a quarter above ", fmt(reserve_base_ha), " ha. Buffer zones and native communities: +25% on the same quarters last year"),
+    "Send locations to SERNANP and the environmental prosecutor; check on images; flight over the area",
+    "Mining again in old pits; dredges; legality",
+  "4 Forest that became mining", "Late",
+    paste0(fmt(k4v("Inside the reserves", 2025)), " ha inside reserves and ", fmt(k4v("Buffer zones", 2025)), " ha in buffer zones in 2025: RED. All Madre de Dios ",
+           fmt(k4v("All Madre de Dios", 2025)), " ha, record year"),
+    "MapBiomas Peru Collection 4", "Yearly (5 to 17 months)", "Above the previous 5 year average + 2 standard deviations",
+    "Report to donors and government; ask for action at the named place",
+    "Rivers; mining again on old sites; mercury",
+  "5 New mining outside Madre de Dios", "Now",
+    paste0(fmt(k5_26), " ha in Q1 to Q3 2026 (", pct(k5_change), "): not red. 2025: ", fmt(k5v("2025")), " ha, most in Huánuco"),
+    "Amazon Mining Watch; GADM", "Quarterly (days; provisional)", "+25% on the same quarters last year",
+    "Tell SERNANP and the regional government about a new front; check concessions",
+    "Legality (most is inside concessions); rivers")
+knitr::kable(kpi, caption = "Five indicators for FZS")
+write_csv(kpi, file.path(OUT, "table8_kpi_summary.csv"))
+```
+
+# Context: other signals we checked
+
+These signals are useful to understand the problem, and some are strong
+for one country. But each has a problem that stops it from being one of
+FZS's five yearly indicators. They are descriptions only; none of them
+shows what causes mining.
+
+```{r regional-read}
+num <- function(x) as.numeric(gsub(",", "", x))
+ctry <- c(`604` = "Peru", `170` = "Colombia", `76` = "Brazil", `68` = "Bolivia", `218` = "Ecuador",
+          `862` = "Venezuela", `328` = "Guyana", `740` = "Suriname", `484` = "Mexico")
+read_comtrade <- function(pattern) map_dfr(list.files(REG, pattern, full.names = TRUE), function(f) {
+  d <- fromJSON(f)$data
+  if (length(d) == 0 || NROW(d) == 0) return(NULL)
+  as_tibble(d) %>% filter(customsCode == "C00", motCode == 0, partner2Code == 0, partnerCode == 0) %>%   # drop duplicate rows
+    transmute(year = as.integer(period), country = ctry[as.character(reporterCode)], flow = flowCode,
+              kg = netWgt, usd = primaryValue, qty = qty)
+})
+ct_gold <- read_comtrade("^comtrade_gold_exports_")
+ct_hg   <- read_comtrade("^comtrade_mercury_")
+ct_exc  <- read_comtrade("^comtrade_excavators_")
+check("UN Comtrade: Bolivia mercury imports 2016 (kg)", sum(ct_hg$kg[ct_hg$country == "Bolivia" & ct_hg$year == 2016 & ct_hg$flow == "M"]), 224195)
+check("UN Comtrade: Peru mercury imports 2014 (kg)", sum(ct_hg$kg[ct_hg$country == "Peru" & ct_hg$year == 2014 & ct_hg$flow == "M"]), 102344)
+```
+
+| Signal | What it shows | Why it is context, not a KPI |
+|--------|---------------|------------------------------|
+| New mining by country (Amazon Mining Watch) | Peru, Colombia, Brazil on one scale | Misses river mining, which is most of Colombia's |
+| Gold trade in Colombia and Brazil | Where illegal gold enters the legal chain | No export gap to measure; smuggling moves outside the data |
+| Mercury imports | Legal mercury collapsed; supply moved to Bolivia and smuggling | Legal trade no longer measures mercury use |
+| Coca | Shares land with gold mining | Moves with eradication; prices stop in 2023; no tested link to gold |
+| Malaria in Brazilian garimpos | People working in mining, also on rivers | Strong for Brazil only; depends on testing |
+| Aviation fuel in Brazil | Supply of remote garimpos by plane | Legal uses too; series ends in 2024 |
+| Dredges seized in Colombia | River mining machines | Measures police effort as much as mining |
+| Dredges in Loreto (MAAP) | River mining in Peru | Irregular reports; no count for Madre de Dios rivers |
+| Excavator imports | Machines for mining | Also used for roads and farms |
+| Traffic at highway tolls (Likitha) | Trucks and people moving on the mining road | Only 3 tolls; one toll did not count for 16 months; we do not know what trucks carry |
+
+## New mining by country
+
+```{r regional-amw}
+read_gadm0 <- function(cc) st_read(paste0("/vsizip/", normalizePath(file.path(REG, sprintf("gadm41_%s_0.json.zip", cc))), "/", sprintf("gadm41_%s_0.json", cc)), quiet = TRUE)
+countries <- bind_rows(dep1 %>% st_union() %>% st_sf(geometry = .) %>% mutate(country = "Peru"),
+                       read_gadm0("COL") %>% transmute(country = "Colombia"), read_gadm0("BRA") %>% transmute(country = "Brazil"))
+amw_c <- amw_pts_all %>% mutate(country = countries$country[sapply(st_intersects(amw_pts_all, countries), function(i) if (length(i)) i[1] else NA)],
+                                country = replace_na(country, "Other Amazon countries"),
+                                period = if_else(grepl("^Q", onset), paste0("20", substr(onset, 3, 4), " Q", substr(onset, 2, 2)), onset)) %>%
+  st_drop_geometry()
+amw_country <- amw_c %>% filter(period != "2018") %>% count(country, period) %>%
+  pivot_wider(names_from = country, values_from = n, values_fill = 0) %>% arrange(period)
+knitr::kable(amw_country, caption = "Amazon Mining Watch: new mining patches by country and first period (2019 to 2024 confirmed; quarters provisional)")
+write_csv(amw_country, file.path(OUT, "tableR1_amw_by_country.csv"))
+yq <- function(cn, yy) sum(amw_c$country == cn & amw_c$period %in% paste(yy, c("Q1", "Q2", "Q3")))
+amw_yoy <- tibble(country = c("Peru", "Colombia", "Brazil", "Other Amazon countries")) %>%
+  mutate(q2025 = map_int(country, yq, yy = 2025), q2026 = map_int(country, yq, yy = 2026), change_pct = 100 * (q2026 / q2025 - 1))
+knitr::kable(amw_yoy %>% mutate(change_pct = round(change_pct)), caption = "New patches in Q1 to Q3 2026 against Q1 to Q3 2025, by country")
+for (i in seq_len(nrow(amw_yoy))) log_number(paste0("amw_chg_", gsub(" ", "_", tolower(amw_yoy$country[i]))), paste("AMW new patches Q1 to Q3 2026 vs 2025,", amw_yoy$country[i]), amw_yoy$change_pct[i], "%", "Amazon Mining Watch + GADM")
+ma <- read_csv(file.path(REG, "coursepack_mining_area.csv"), show_col_types = FALSE)
+check("Course pack: Brazil artisanal mining in all indigenous lands, 2025 (ha)", ma$mining_artisanal_ha[ma$territory == "all indigenous lands combined" & ma$year == 2025], 39915)
+```
+
+**[Description]** Amazon Mining Watch sees new mining in all three
+countries, but very little in Colombia, because most Colombian Amazon
+mining is on rivers. Colombia's official yearly measure is the
+UNODC and Ministry of Mines survey: `r fmt(pub("evoa_2025"))` ha of
+alluvial gold mining on land in 2025, `r pub("evoa_illicit")`% of it
+illicit, with river mining alerts in `r pub("evoa_river_sectors")`
+sectors of 11 Amazon rivers. It is published only as press releases
+and PDFs. For Brazil, MapBiomas (course pack) records
+`r fmt(ma$mining_artisanal_ha[ma$territory == "all indigenous lands combined" & ma$year == 2025])`
+ha of artisanal mining inside indigenous lands in 2025.
+
+## Gold trade in Colombia and Brazil
+
+```{r col-bra-gold}
+anm <- read_csv(file.path(REG, "colombia_anm_gold_production.csv"), show_col_types = FALSE, col_types = cols(.default = "c")) %>%
+  mutate(kg = num(volumenes_de_explotacion) / 1000, year = as.integer(a_o_liquidado))
+col_prod <- anm %>% group_by(year) %>% summarise(prod_t = sum(kg, na.rm = TRUE) / 1000)
+check("ANM Colombia: declared gold production 2023 (t)", col_prod$prod_t[col_prod$year == 2023], 61.34, tol = 0.01)
+exports_value <- ct_gold %>% group_by(year, country) %>% summarise(usd_bn = sum(usd) / 1e9, .groups = "drop")
+knitr::kable(exports_value %>% filter(country %in% c("Peru", "Colombia", "Brazil", "Bolivia", "Ecuador", "Guyana", "Suriname"), year >= 2016) %>%
+               mutate(usd_bn = round(usd_bn, 2)) %>% pivot_wider(names_from = country, values_from = usd_bn),
+             caption = "Gold exports (HS 7108), USD billion, as reported to UN Comtrade (blank = not yet reported)")
+write_csv(exports_value, file.path(OUT, "tableR3_gold_exports_comtrade.csv"))
+log_number("co_prod_2024", "Colombia declared gold production, 2024", col_prod$prod_t[col_prod$year == 2024], "t", "ANM r85m-vv6c")
+log_number("co_prod_2025", "Colombia declared gold production, 2025", col_prod$prod_t[col_prod$year == 2025], "t", "ANM r85m-vv6c")
+log_number("br_exp_2025", "Brazil gold exports, 2025", exports_value$usd_bn[exports_value$country == "Brazil" & exports_value$year == 2025], "USD bn", "UN Comtrade HS 7108")
+
+sw <- read_delim(file.path(REG, "swiss_gold_imports_by_origin.csv"), delim = ";", show_col_types = FALSE)
+swiss <- sw %>% filter(Control_code == 911, Country_txt %in% c("Peru", "Colombia", "Brazil", "Bolivia", "Ecuador", "Suriname")) %>%
+  group_by(Country_txt, year) %>% summarise(t = sum(Quantity_kg) / 1000, .groups = "drop")
+check("Swiss customs: mined gold imported from Peru, 2025 (kg)", 1000 * swiss$t[swiss$Country_txt == "Peru" & swiss$year == 2025], 140922)
+knitr::kable(swiss %>% mutate(t = round(t, 1)) %>% pivot_wider(names_from = year, values_from = t),
+             caption = paste0("Switzerland's imports of mined gold (control code 911) by origin, tonnes gross weight (", max(sw$year), " = January to ", month.name[max(sw$month[sw$year == max(sw$year)])], ")"))
+```
+
+**[Description]** In **Colombia**, the value of gold exports is about
+equal to or below the value of declared production, so there is no
+export gap to measure. Illegal gold probably enters the legal chain
+*before* export, declared as production **[Interpretation, not
+tested]**. Declared production was
+`r fmt(col_prod$prod_t[col_prod$year == 2024], 1)` t in 2024 and
+`r fmt(col_prod$prod_t[col_prod$year == 2025], 1)` t in 2025. In
+**Brazil**, gold registered by garimpos fell from
+`r fmt(pub("escolhas_garimpo_2022"))` kg in 2022 to
+`r fmt(pub("escolhas_garimpo_2025"))` kg in 2025 (Instituto Escolhas,
+from royalty data), after new rules in 2023, while exports reached
+USD `r round(exports_value$usd_bn[exports_value$country == "Brazil" & exports_value$year == 2025], 1)`
+bn in 2025. Less declared garimpo gold does not mean less garimpo:
+Escolhas argues that the gold now leaves by smuggling.
+
+## Mercury
+
+```{r mercury}
+# 2025 is left out: several countries had not reported a full year when we downloaded (e.g. Bolivia shows 0 kg)
+hg_m <- ct_hg %>% filter(flow == "M", year <= 2024, country %in% c("Peru", "Colombia", "Brazil", "Bolivia", "Guyana")) %>%
+  group_by(year, country) %>% summarise(t = sum(kg, na.rm = TRUE) / 1000, .groups = "drop")
+hg_mx <- ct_hg %>% filter(flow == "X", country == "Mexico") %>% group_by(year) %>% summarise(t = sum(kg, na.rm = TRUE) / 1000)
+knitr::kable(hg_m %>% mutate(t = round(t, 1)) %>% pivot_wider(names_from = country, values_from = t) %>%
+               left_join(hg_mx %>% transmute(year, `Mexico exports` = round(t, 1)), "year") %>% arrange(year),
+             caption = "Mercury (HS 280540): imports by country and Mexico's exports, tonnes, 2010 to 2024 (blank = no row reported)")
+write_csv(hg_m, file.path(OUT, "tableR4_mercury_imports.csv"))
+```
+
+```{r fig-mercury, fig.height = 3.6}
+ggplot(hg_m, aes(year, t, colour = country)) + geom_line(linewidth = 0.9) + geom_point(size = 1.5) +
+  scale_colour_manual(values = c(Peru = col_alert, Colombia = col_soft, Brazil = "#27AE60", Bolivia = col_main, Guyana = col_grey), name = NULL) +
+  scale_x_continuous(breaks = seq(2010, 2024, 2)) +
+  labs(title = "Legal mercury imports: Peru and Colombia collapsed, Bolivia took over",
+       x = NULL, y = "tonnes", caption = "Source: UN Comtrade, HS 280540, imports as reported by each country. Missing years are gaps.")
+ggsave(file.path(OUT, "figR_mercury.png"), width = 9, height = 3.6, dpi = 200, bg = "white")
+```
+
+**[Description]** Legal mercury imports into Peru fell from
+`r round(hg_m$t[hg_m$country == "Peru" & hg_m$year == 2011])` t (2011)
+to almost nothing after 2015. Colombia's fell from
+`r round(hg_m$t[hg_m$country == "Colombia" & hg_m$year == 2016])` t
+(2016) to about 2 t a year, once its ban on mercury in mining took
+effect (Ley 1658 of 2013, in force for mining from 2018). In the same
+years Bolivia became the largest importer in the region
+(`r round(hg_m$t[hg_m$country == "Bolivia" & hg_m$year == 2016])` t in
+2016). Mining did not stop, so **legal imports no longer measure mercury
+use**. The Environmental Investigation Agency (2025) documented hidden
+shipments from Mexico to Peru and Colombia. What FZS can track instead
+is seizures (no open series exists) and mercury in people and fish
+(sampling on the ground).
+
+## Coca
+
+```{r coca}
+coca <- read_csv(file.path(REG, "colombia_coca_hectares_municipality.csv"), show_col_types = FALSE) %>%
+  pivot_longer(starts_with("_"), names_to = "year", values_to = "ha") %>%
+  mutate(year = as.integer(sub("_", "", year)), ha = replace_na(as.numeric(ha), 0))
+check("Colombia coca cultivation, national total 2024 (ha)", sum(coca$ha[coca$year == 2024]), 261386)
+amazon_deps <- c("PUTUMAYO", "CAQUETÁ", "GUAVIARE", "AMAZONAS", "GUAINÍA", "VAUPÉS")
+coca_amz <- coca %>% filter(departamento %in% amazon_deps, year >= 2015) %>% group_by(year) %>% summarise(ha = sum(ha))
+cp <- read_excel(file.path(REG, "peru_devida_coca_leaf_prices_2020_2023.xlsx"))
+mes <- c(Enero = 1, Febrero = 2, Marzo = 3, Abril = 4, Mayo = 5, Junio = 6, Julio = 7, Agosto = 8, Setiembre = 9, Octubre = 10, Noviembre = 11, Diciembre = 12)
+coca_p <- cp %>% pivot_longer(-ZEI, names_to = "m", values_to = "pen_kg") %>%
+  mutate(month = mes[str_extract(m, "^[A-Za-z]+")], year = as.integer(str_extract(m, "\\d{4}")), date = as.Date(sprintf("%d-%02d-01", year, month))) %>%
+  filter(!is.na(pen_kg))
+knitr::kable(coca_p %>% filter(ZEI %in% c("Sur Amazónico", "Triple Frontera", "NACIONAL"), month %in% c(1, 7)) %>%
+               transmute(Zone = ZEI, Month = format(date, "%b %Y"), `Leaf price (soles per kg)` = round(pen_kg, 2)) %>%
+               pivot_wider(names_from = Month, values_from = `Leaf price (soles per kg)`),
+             caption = "Peru: coca leaf price by zone (DEVIDA), soles per kg, January and July of each year")
+log_number("co_coca_amz_2024", "Coca cultivation in Colombia's six Amazon departments, 2024", coca_amz$ha[coca_amz$year == 2024], "ha", "MinJusticia/SIMCI acs4-3wgp")
+```
+
+**[Description]** Coca and gold mining share land: according to UNODC
+and Colombia's Ministry of Mines, `r pub("evoa_coca_overlap")`% of the
+land with alluvial gold mining in 2025 overlapped with coca. In
+Colombia's six Amazon departments coca covered
+`r fmt(coca_amz$ha[coca_amz$year == 2024])` ha in 2024. In Peru, the
+national coca leaf price fell from
+S/ `r round(coca_p$pen_kg[coca_p$ZEI == "NACIONAL" & coca_p$date == as.Date("2020-01-01")], 2)`
+per kg (January 2020) to
+S/ `r round(min(coca_p$pen_kg[coca_p$ZEI == "NACIONAL"]), 2)` (its
+lowest) and later recovered. The idea that people switch to gold when
+coca prices fall is possible but **not tested** in the evidence we
+found, and coca also moves with forced eradication.
+
+## Signals of activity: malaria, fuel, dredges, machines
+
+```{r malaria}
+mal <- map_dfr(list.files(REG, "^brazil_malaria_special_areas_\\d{4}\\.csv$", full.names = TRUE),
+               ~ read_csv(.x, show_col_types = FALSE, col_types = cols(.default = "c")))
+names(mal) <- c("cod_mun", "mun", "uf", "year", "area", "n")
+mal <- mal %>% filter(year != "All", area != "All", uf != "All") %>% mutate(n = num(n), year = as.integer(year))   # drop subtotal rows
+mal_y <- mal %>% group_by(year) %>% summarise(total = sum(n), garimpo = sum(n[area == "Garimpo"]), .groups = "drop") %>%
+  mutate(share = 100 * garimpo / total)
+check("Brazil Ministry of Health: autochthonous malaria cases 2022", mal_y$total[mal_y$year == 2022], 128968)
+mal_uf <- mal %>% filter(area == "Garimpo") %>% group_by(uf, year) %>% summarise(n = sum(n), .groups = "drop")
+knitr::kable(mal_y %>% transmute(Year = year, `All cases` = fmt(total), `Caught in garimpo areas` = fmt(garimpo), `Share (%)` = round(share, 1)),
+             caption = "Brazil: malaria cases caught in Brazil, and those caught in a garimpo area (2026: January to early October)")
+write_csv(mal_uf, file.path(OUT, "tableR5_brazil_malaria_garimpo_by_state.csv"))
+mv <- function(y) mal_y$garimpo[mal_y$year == y]
+log_number("br_mal_garimpo_2022", "Brazil malaria cases caught in garimpo areas, 2022", mv(2022), "cases", "Ministério da Saúde, Tableau 'Dados para Cidadão'")
+log_number("br_mal_garimpo_2025", "Brazil malaria cases caught in garimpo areas, 2025", mv(2025), "cases", "Ministério da Saúde")
+log_number("br_mal_garimpo_2026", "Brazil malaria cases caught in garimpo areas, 2026 to early October", mv(2026), "cases", "Ministério da Saúde")
+```
+
+```{r fig-malaria, fig.height = 3.8}
+mal_uf %>% filter(uf %in% c("PA", "RR", "AP", "MT", "AM")) %>%
+  mutate(uf = recode(uf, PA = "Pará", RR = "Roraima (Yanomami)", AP = "Amapá", MT = "Mato Grosso", AM = "Amazonas")) %>%
+  ggplot(aes(year, n, fill = uf)) + geom_col() +
+  scale_fill_manual(values = c("Pará" = col_main, "Roraima (Yanomami)" = col_alert, "Amapá" = col_soft, "Mato Grosso" = col_grey, "Amazonas" = "#5DADE2"), name = NULL) +
+  scale_y_continuous(labels = scales::comma) + scale_x_continuous(breaks = 2018:2026) +
+  labs(title = "Brazil: malaria cases caught in garimpo areas, by state", subtitle = "2026: January to early October only",
+       x = NULL, y = "cases", caption = "Source: Ministério da Saúde, SIVEP Malária, 'Dados para Cidadão' dashboard (área especial = Garimpo).")
+ggsave(file.path(OUT, "figR_brazil_malaria.png"), width = 9, height = 3.8, dpi = 200, bg = "white")
+```
+
+**[Description]** In Brazil, malaria caught in garimpo areas rose from
+`r fmt(mv(2018))` cases (2018) to `r fmt(mv(2022))` (2022), fell to
+`r fmt(mv(2025))` in 2025, and reached `r fmt(mv(2026))` by early
+October 2026, already `r round(100 * mv(2026) / mv(2025))`% of the 2025
+total. In Roraima (Yanomami land) cases fell sharply after the federal
+operation of 2023; in Pará (Munduruku land and the Tapajós) they stayed
+high. Malaria follows people who work in garimpos, so it measures
+**activity**, and it also sees mining on rivers. It depends on how much
+testing is done, and garimpos inside indigenous lands may be recorded as
+"indigenous area".
+
+```{r fuel}
+read_anp <- function(f) { d <- read_delim(file.path(REG, f), delim = ";", show_col_types = FALSE, col_types = cols(.default = "c"))
+  names(d) <- c("year", "region", "uf", "product", "ibge", "mun", "sales"); d %>% mutate(year = as.integer(year), sales = num(sales)) }
+avgas <- read_anp("brazil_anp_avgas_municipality.csv"); diesel <- read_anp("brazil_anp_diesel_municipality.csv")
+hubs <- c(`1400100` = "Boa Vista (RR)", `1503606` = "Itaituba (PA)", `1400050` = "Alto Alegre (RR)", `1503804` = "Jacareacanga (PA)")
+fuel <- bind_rows(avgas %>% mutate(fuel = "Aviation gasoline"), diesel %>% mutate(fuel = "Diesel")) %>%
+  filter(ibge %in% names(hubs), year >= 2014) %>% mutate(place = hubs[ibge]) %>% group_by(fuel, place, year) %>% summarise(m3 = sum(sales) / 1000, .groups = "drop")
+knitr::kable(fuel %>% filter(fuel == "Aviation gasoline", place %in% c("Boa Vista (RR)", "Itaituba (PA)")) %>% mutate(m3 = round(m3)) %>%
+               pivot_wider(names_from = place, values_from = m3) %>% select(-fuel),
+             caption = "Brazil: aviation gasoline sales, thousand litres (ANP)")
+av_bv <- function(y) avgas$sales[avgas$ibge == "1400100" & avgas$year == y]
+check("ANP: aviation gasoline sales, Boa Vista, 2021 (litres)", av_bv(2021), 3207403)
+log_number("br_avgas_bv_2021", "Aviation gasoline sales, Boa Vista, 2021", av_bv(2021), "litres", "ANP")
+log_number("br_avgas_bv_2024", "Aviation gasoline sales, Boa Vista, 2024", av_bv(2024), "litres", "ANP")
+write_csv(fuel, file.path(OUT, "tableR6_brazil_fuel_hubs.csv"))
+```
+
+**[Description]** Small planes supply garimpos on Yanomami land from
+Boa Vista. Aviation gasoline sales there rose from
+`r fmt(av_bv(2016) / 1000)` thousand litres (2016) to
+`r fmt(av_bv(2021) / 1000)` (2021) and fell to
+`r fmt(av_bv(2024) / 1000)` (2024), after the federal operation that
+started in 2023. Aviation fuel also has legal uses, and the series ends
+in 2024.
+
+```{r dredges}
+md <- read_csv(file.path(REG, "colombia_mindefensa_machinery_seized.csv"), show_col_types = FALSE) %>%
+  mutate(year = as.integer(substr(fecha_hecho, 1, 4)), dredge = grepl("DRAGA", clase_de_bien))
+dredges_col <- md %>% filter(dredge, year >= 2016) %>%
+  mutate(region = if_else(departamento %in% c("AMAZONAS", "CAQUETA", "PUTUMAYO", "GUAINIA", "GUAVIARE", "VAUPES"), str_to_title(departamento), "Rest of Colombia")) %>%
+  group_by(region, year) %>% summarise(n = sum(cantidad), .groups = "drop")
+check("MinDefensa: dredges destroyed or seized in Amazonas department, 2025", sum(dredges_col$n[dredges_col$region == "Amazonas" & dredges_col$year == 2025]), 56)
+knitr::kable(dredges_col %>% pivot_wider(names_from = year, values_from = n, values_fill = 0),
+             caption = paste0("Colombia: dredges seized or destroyed, by department (", max(md$year), ": to ", format(max(as.Date(substr(md$fecha_hecho, 1, 10))), "%B"), ")"))
+write_csv(dredges_col, file.path(OUT, "tableR7_colombia_dredges.csv"))
+co_dr_amz_2025 <- sum(dredges_col$n[dredges_col$region != "Rest of Colombia" & dredges_col$year == 2025])
+log_number("co_dredges_amazon_2025", "Dredges seized or destroyed in Colombia's six Amazon departments, 2025", co_dr_amz_2025, "dredges", "MinDefensa dxs6-mdeg")
+
+dredges_pe <- tribble(
+  ~Published, ~Source, ~Area, ~Period, ~Figure,
+  "29 Sep 2025", "MAAP #233", "Loreto", "2017 to 2025", paste(fmt(pub("maap233_loreto")), "dredges recorded"),
+  "29 Sep 2025", "MAAP #233", "Nanay river (Loreto)", "2017 to 2025", paste0(fmt(pub("maap233_nanay")), " recorded, of which ", pub("maap233_nanay25"), " in 2025"),
+  "29 Sep 2025", "MAAP #233", "Peruvian Amazon", "to 2025", paste("mining in", pub("maap233_water"), "water bodies"),
+  "17 Aug 2026", "MAAP (via Actualidad Ambiental)", "Loreto", "2025 to Jun 2026", paste0("more than ", pub("aa_records"), " records, ", pub("aa_rivers"), " rivers"))
+knitr::kable(dredges_pe, caption = "Peru: published dredge counts (typed by hand)")
+write_csv(dredges_pe, file.path(OUT, "tableR10_peru_dredges_published.csv"))
+```
+
+**[Description]** In Colombia, the security forces seized or destroyed
+`r co_dr_amz_2025` dredges in the six Amazon departments in 2025. These
+counts measure **police effort** as much as mining: more dredges
+destroyed can mean more mining or more operations. In Peru, the only
+repeated public count of dredges is MAAP's, mostly for Loreto, read by
+hand from images; records are not unique dredges (the same dredge is
+seen many times). No source counts dredges on Madre de Dios rivers.
+
+```{r excavators}
+exc <- ct_exc %>% group_by(year, country) %>% summarise(units = sum(qty, na.rm = TRUE), .groups = "drop")
+knitr::kable(exc %>% mutate(units = round(units)) %>% pivot_wider(names_from = country, values_from = units),
+             caption = "Imports of excavators (HS 842952), units, UN Comtrade (blank = not yet reported)")
+write_csv(exc, file.path(OUT, "tableR8_excavator_imports.csv"))
+```
+
+**[Description]** Between 2019 and 2024 excavator imports grew
+`r round(exc$units[exc$country == "Peru" & exc$year == 2024] / exc$units[exc$country == "Peru" & exc$year == 2019], 1)` times
+in Peru,
+`r round(exc$units[exc$country == "Colombia" & exc$year == 2024] / exc$units[exc$country == "Colombia" & exc$year == 2019], 1)` times
+in Colombia and
+`r round(exc$units[exc$country == "Brazil" & exc$year == 2024] / exc$units[exc$country == "Brazil" & exc$year == 2019], 1)` times
+in Brazil. Excavators are also used for roads, farms and legal mining,
+so this is weak as a mining measure on its own.
+
+**Traffic at highway tolls.** Likitha studied traffic at the three toll
+stations on the Interoceanic Highway (OSITRAN data, separate file).
+Traffic grew much more at the toll next to the mining area than at the
+two other tolls. It is a good sign of activity on the mining road, but
+there are only three tolls, one toll stopped counting vehicles for 16
+months after the 2023 protests, and we do not know what the trucks
+carry. So it is context, not a KPI.
+
+## Regional dashboard
+
+```{r regional-figure, fig.width = 10, fig.height = 8}
+r1 <- ggplot(filter(gap_y, year >= 2012), aes(year, gap_pct)) + geom_col(fill = col_main) +
+  labs(title = "Peru: gold exported but not declared as produced", subtitle = "% of exports · BCRP", x = NULL, y = "%")
+r2 <- ggplot(mal_y, aes(year, garimpo, fill = year == 2026)) + geom_col() +
+  scale_fill_manual(values = c(`FALSE` = col_main, `TRUE` = col_soft), guide = "none") + scale_y_continuous(labels = scales::comma) +
+  labs(title = "Brazil: malaria caught in garimpo areas", subtitle = "cases · 2026 to early October", x = NULL, y = "cases")
+r3 <- dredges_col %>% filter(region != "Rest of Colombia") %>% group_by(year) %>% summarise(n = sum(n)) %>%
+  ggplot(aes(year, n, fill = year == max(year))) + geom_col() + scale_fill_manual(values = c(`FALSE` = col_main, `TRUE` = col_soft), guide = "none") +
+  labs(title = "Colombian Amazon: dredges seized or destroyed", subtitle = "6 Amazon departments · last year not complete", x = NULL, y = "dredges")
+r4 <- amw_yoy %>% filter(country != "Other Amazon countries") %>% pivot_longer(c(q2025, q2026)) %>%
+  mutate(name = recode(name, q2025 = "Q1 to Q3 2025", q2026 = "Q1 to Q3 2026")) %>%
+  ggplot(aes(country, value, fill = name)) + geom_col(position = "dodge") + scale_fill_manual(values = c(col_grey, col_alert), name = NULL) +
+  labs(title = "New mining patches seen by satellite", subtitle = "Amazon Mining Watch · provisional", x = NULL, y = "patches")
+yrs <- scale_x_continuous(breaks = seq(2012, 2026, 2))
+r1 <- r1 + yrs; r2 <- r2 + yrs; r3 <- r3 + yrs
+(r1 + r2) / (r3 + r4) + plot_annotation(title = "Four regional signals beyond the yearly land maps",
+  caption = "Sources: BCRP; Ministério da Saúde (Brazil); MinDefensa (Colombia); Amazon Mining Watch. Descriptions only.",
+  theme = theme(plot.title = element_text(face = "bold", size = 13)))
+ggsave(file.path(OUT, "figR_regional_dashboard.png"), width = 10, height = 8, dpi = 220, bg = "white")
+```
+
+```{r regional-kpis}
+regional <- tribble(
+  ~Country, ~Signal, ~`Value today`, ~Source, ~`Updated (delay)`, ~`Does not show`,
+  "Brazil", "Malaria cases caught in garimpo areas",
+    paste0(fmt(mv(2025)), " in 2025; ", fmt(mv(2026)), " to early Oct 2026"),
+    "Ministério da Saúde (SIVEP Malária dashboard)", "Weekly (days)", "Garimpos recorded as 'indigenous area'; depends on testing",
+  "Brazil", "Aviation gasoline sales in garimpo air hubs (Boa Vista, Itaituba)",
+    paste0(fmt(av_bv(2024) / 1000), " thousand litres in Boa Vista, 2024"),
+    "ANP", "Yearly (about 1 year)", "Legal aviation; one town is not one mining area",
+  "Colombia", "Dredges seized or destroyed in the Amazon departments",
+    paste0(co_dr_amz_2025, " in 2025"), "MinDefensa (datos.gov.co dxs6-mdeg)", "Monthly (2 to 3 weeks)", "Police effort, not only mining",
+  "All three", "New mining patches seen by satellite, by country",
+    paste0("Peru ", pct(amw_yoy$change_pct[amw_yoy$country == "Peru"]), ", Brazil ", pct(amw_yoy$change_pct[amw_yoy$country == "Brazil"]),
+           ", Colombia ", pct(amw_yoy$change_pct[amw_yoy$country == "Colombia"]), " (Q1 to Q3 2026 vs 2025)"),
+    "Amazon Mining Watch", "Quarterly (days; provisional)", "River mining (most of Colombia's)",
+  "Region", "Mercury imports; coca",
+    paste0("Bolivia ", round(hg_m$t[hg_m$country == "Bolivia" & hg_m$year == 2023]), " t of mercury (2023); Colombian Amazon coca ", fmt(coca_amz$ha[coca_amz$year == 2024]), " ha (2024)"),
+    "UN Comtrade; MinJusticia/SIMCI; DEVIDA", "Yearly (1 to 2 years)", "Smuggled mercury; no tested link between coca and gold")
+knitr::kable(regional, caption = "Context signals for the region")
+write_csv(regional, file.path(OUT, "tableR9_regional_context.csv"))
+```
+
+# Did the satellite methods change?
+
+Our indicators compare years, so a change in *how* images are classified
+can look like a change in mining. We checked the documents of each
+satellite source.
+
+- **MapBiomas Peru (Collection 4).** Every collection classifies all
+  years again from 1985, so values change between collections (Madre de
+  Dios, 2022: about `r fmt(pub("c2_mdd_2022"))` ha in Collection 2,
+  `r fmt(c4_mdd_2022)` ha in Collection 4). The images come from
+  several Landsat satellites over time. The Collection 4 method
+  documents were offline when we checked (14 October 2026). The method
+  is described as following MapBiomas Brazil's mining method, which
+  corrects each year using the year before and the year after. The last
+  year (here 2025) has no "year after", so it is the least corrected and
+  the most likely to change in the next collection.
+- **Amazon Mining Watch.** Its README (3 October 2026) says the model
+  "was wholly redeveloped in 2026 and the data recomputed starting from
+  year 2018". Older MAAP figures based on Amazon Mining Watch are
+  therefore not comparable with today's files. Quarterly detections use
+  a stricter rule than yearly ones. The scar map is "in development" and
+  its areas "run large".
+- **MapBiomas Brazil (course pack).** The municipality table is
+  Collection 10.1 and `mining_area.csv` is Collection 11; we do not
+  combine them.
+- **MAAP.** Its long series joins different methods over time, and its
+  2021 to 2023 total was revised from `r fmt(pub("maap195_2123"))` ha
+  (#195) to `r fmt(pub("maap208_2123"))` ha (#208).
+
+**A possible break in 2023.** The flows between water and mining change
+suddenly in 2023, and not only in Madre de Dios:
+
+```{r method-break}
+flip_tab <- tr_pol %>% filter(year >= 2016) %>%
+  mutate(region = if_else(unit == "Madre de Dios", "Madre de Dios", "Rest of Peru"),
+         flow = case_when(class_from %in% WATER & class_to == MINING ~ "Water to mining",
+                          class_from == MINING & class_to %in% WATER ~ "Mining to water")) %>%
+  filter(!is.na(flow)) %>% group_by(region, flow, year) %>% summarise(ha = sum(ha), .groups = "drop")
+knitr::kable(flip_tab %>% mutate(ha = fmt(ha)) %>% pivot_wider(names_from = year, values_from = ha) %>% arrange(flow, region),
+             caption = "Flows between water and mining (ha per year), MapBiomas Peru Collection 4")
+write_csv(flip_tab, file.path(OUT, "table1c_water_mining_flips.csv"))
+fv <- function(r, fl, y) flip_tab$ha[flip_tab$region == r & flip_tab$flow == fl & flip_tab$year %in% y]
+log_number("w2m_rest_2023", "Water to mining, rest of Peru, 2023", fv("Rest of Peru", "Water to mining", 2023), "ha", "MapBiomas C4 transitions")
+log_number("m2w_mdd_2023", "Mining to water, Madre de Dios, 2023", fv("Madre de Dios", "Mining to water", 2023), "ha", "MapBiomas C4 transitions")
+```
+
+**[Description]** In Madre de Dios, on average
+`r fmt(mean(fv("Madre de Dios", "Mining to water", 2019:2022)))` ha of
+mining land a year was relabelled as water in 2019 to 2022, but only
+`r fmt(fv("Madre de Dios", "Mining to water", 2023))` ha in 2023. At the
+same time `r fmt(fv("Madre de Dios", "Water to mining", 2023))` ha of
+water was relabelled as mining. In the rest of Peru, water to mining
+also jumped, from an average of
+`r fmt(mean(fv("Rest of Peru", "Water to mining", 2016:2022)))` ha a year
+in 2016 to 2022 to `r fmt(fv("Rest of Peru", "Water to mining", 2023))`
+ha in 2023. Miners going back to old pits in Madre de Dios would not
+explain the same jump in the rest of Peru, so part of the 2023 change
+may come from how this collection classified ponds and mining
+**[Interpretation, not tested]**. We could not confirm this in the
+documents. KPI 4 does not use these flows, which is one more reason to
+prefer forest that became mining.
+
+# What the data cannot see
+
+- **Rivers and mercury.** No land map measures dredges, or mercury in
+  water, fish and people. Dredge counts exist only for Loreto (Peru) and
+  as police seizures (Colombia). Mercury needs sampling on the ground.
+- **Legality.** "Mining" includes legal mining in the mining corridor.
+  A mining title does not prove legality, and no title does not prove
+  illegality. Only mining inside a reserve is clearly illegal.
+- **Revisions and model changes.** Every MapBiomas collection revises
+  earlier years, and Amazon Mining Watch rebuilt its model in 2026 and
+  replaces its files. FZS should save each version it uses and write
+  the version next to every number.
+- **Targets.** If an indicator becomes a target (for example, mining
+  inside a reserve), miners and agencies may respond to the number
+  rather than to the problem.
+
+```{r save-numbers}
+numbers <- bind_rows(numbers, published %>% mutate(source = paste(source, "(typed by hand)"))) %>% mutate(value = round(value, 2))
+stopifnot(!any(duplicated(numbers$id)))
+write_csv(numbers, file.path(OUT, "numbers_in_brief.csv"))
+knitr::kable(numbers, caption = "Numbers produced or quoted in this notebook (output/numbers_in_brief.csv)")
+sessionInfo()
+```

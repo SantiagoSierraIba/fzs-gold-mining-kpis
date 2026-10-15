@@ -1,0 +1,169 @@
+id,description,value,unit,source
+chk_mdd_2025,"Mining area, Madre de Dios, 2025",112621.71,ha,"MapBiomas Peru C4, Limites politicos, COVERAGE_4, class 30"
+chk_amz_2025,"Mining area, Peru Amazon biome, 2025",118295.55,ha,"MapBiomas Peru C4, Limites politicos"
+chk_tamb_za_2025,"Mining area, Tambopata buffer zone, 2025",20730.03,ha,"MapBiomas Peru C4, Zona de amortiguamiento"
+gold_aug2026,"Gold price, August 2026",4411,USD per oz,"World Bank Pink Sheet, Oct 2026 vintage"
+amw_mdd_n,Amazon Mining Watch detections in Madre de Dios (all periods),27302,patches,"Amazon Mining Watch, README dated 3 Oct 2026"
+amw_peru_2024,AMW detections in Peru with onset 2024 (version check),2072,patches,Amazon Mining Watch GeoJSON
+scar_peru_all,"AMW new scar, Peru, all periods 2018 to 2026 Q3",185553.74,ha,AMW scar map (our sum)
+scar_peru_all_amw,"AMW new scar, Peru, all periods, AMW's own table",185565.6,ha,AMW mined_areas_by_jurisdiction.csv
+net_2021,"Net addition, Madre de Dios, 2021",4940.17,ha,MapBiomas C4
+net_2022,"Net addition, Madre de Dios, 2022",10540.32,ha,MapBiomas C4
+net_2023,"Net addition, Madre de Dios, 2023",19339.4,ha,MapBiomas C4
+net_2024,"Net addition, Madre de Dios, 2024",7573.51,ha,MapBiomas C4
+net_2025,"Net addition, Madre de Dios, 2025",10742.31,ha,MapBiomas C4
+ff_2021,"Forest to mining, Madre de Dios, 2021",6152.25,ha,MapBiomas C4 transitions
+ff_2022,"Forest to mining, Madre de Dios, 2022",7885.03,ha,MapBiomas C4 transitions
+ff_2023,"Forest to mining, Madre de Dios, 2023",9981.9,ha,MapBiomas C4 transitions
+ff_2024,"Forest to mining, Madre de Dios, 2024",7135.59,ha,MapBiomas C4 transitions
+ff_2025,"Forest to mining, Madre de Dios, 2025",10308.19,ha,MapBiomas C4 transitions
+water_2022,"Water to mining, Madre de Dios, 2022",2997.09,ha,MapBiomas C4 transitions
+water_2023,"Water to mining, Madre de Dios, 2023",9615.75,ha,MapBiomas C4 transitions
+water_2024,"Water to mining, Madre de Dios, 2024",394.57,ha,MapBiomas C4 transitions
+share_water_2023,"Share of land coming into mining that was water, 2023",39.08,%,MapBiomas C4 transitions
+gross_in_2025,"Land coming into mining, Madre de Dios, 2025",16474.87,ha,MapBiomas C4 transitions
+gross_out_2024,"Land leaving mining, Madre de Dios, 2024",2947.78,ha,MapBiomas C4 transitions
+gross_out_2025,"Land leaving mining, Madre de Dios, 2025",5732.56,ha,MapBiomas C4 transitions
+gross_out_2001_2025,"Land leaving mining, Madre de Dios, 2001 to 2025 (a pixel can count more than once)",65515.85,ha,MapBiomas C4 transitions
+share_mdd_amazon,"Madre de Dios share of mining area in Peru's Amazon biome, 2025",95.2,%,MapBiomas C4
+left_forestregrowth,Share of land leaving mining in 2025 that became: Forest (regrowth),35.98,%,MapBiomas C4 transitions
+left_farmlandorpasture,Share of land leaving mining in 2025 that became: Farmland or pasture,24.07,%,MapBiomas C4 transitions
+left_riverbeach,Share of land leaving mining in 2025 that became: River beach,15.14,%,MapBiomas C4 transitions
+left_floodedgrassland,Share of land leaving mining in 2025 that became: Flooded grassland,10.79,%,MapBiomas C4 transitions
+left_waterfloodedpitsrivers,"Share of land leaving mining in 2025 that became: Water (flooded pits, rivers)",7.18,%,MapBiomas C4 transitions
+left_otherbarelandurban,"Share of land leaving mining in 2025 that became: Other (bare land, urban)",6.85,%,MapBiomas C4 transitions
+mining_to_water_2122,"Mining land relabelled as water, Madre de Dios, 2021 and 2022",4594.84,ha,MapBiomas C4 transitions
+cum_ff,"Cumulative forest to mining, Madre de Dios, 1985 to 2025",93230.09,ha,MapBiomas C4 transitions
+scar_mdd_2021,"AMW new scar, Madre de Dios, 2021",13418.93,ha,AMW scar map (our sum)
+scar_mdd_2022,"AMW new scar, Madre de Dios, 2022",10403.67,ha,AMW scar map (our sum)
+scar_mdd_2023,"AMW new scar, Madre de Dios, 2023",11664.85,ha,AMW scar map (our sum)
+cmp_1,"Mean yearly addition, Buffer zones 2016 to 2020",1468.46,ha/yr,MapBiomas C4 coverage
+cmp_2,"Mean yearly addition, Buffer zones 2021 to 2025",2529.36,ha/yr,MapBiomas C4 coverage
+cmp_3,"Mean yearly addition, Rest of Madre de Dios 2016 to 2020",2404.65,ha/yr,MapBiomas C4 coverage
+cmp_4,"Mean yearly addition, Rest of Madre de Dios 2021 to 2025",8043.89,ha/yr,MapBiomas C4 coverage
+k1_latest_ratio,"Real gold price in soles / previous 36 month mean, Sep 2026",1.23,ratio,Pink Sheet + BCRP
+k1_episode_1,KPI 1: first month of a period above the red line (yyyymm),202002,yyyymm,Pink Sheet + BCRP
+k1_episode_2,KPI 1: first month of a period above the red line (yyyymm),202104,yyyymm,Pink Sheet + BCRP
+k1_episode_3,KPI 1: first month of a period above the red line (yyyymm),202409,yyyymm,Pink Sheet + BCRP
+k1_latest_real,"Real gold price, soles of Dec 2021, Sep 2026",12074.76,S/ per oz,Pink Sheet + BCRP
+price_2223_vs_1719,"Real gold price in soles, 2022 and 2023 average vs 2017 to 2019 average",37.36,%,Pink Sheet + BCRP
+lagcor_1,Correlation: change in forest to mining vs change in real price one year earlier,0.35,r,MapBiomas C4 + Pink Sheet + BCRP
+pe_gap_2025_t,"Peru gold exports minus declared production, 2025",103,t,"BCRP PN38792BM, RD12978DM"
+pe_gap_2025_pct,"Peru gold gap as share of exports, 2025",49.13,%,BCRP
+pe_gap_2017_pct,"Peru gold gap as share of exports, 2017",25.57,%,BCRP
+pe_gap_h1_2026_pct,"Peru gold gap as share of exports, Jan to Jun 2026",52.85,%,BCRP
+pe_gap_12m_latest,"Peru 12 month gold gap, Jun 2026",51.01,%,BCRP
+pe_gap_jump_latest,"Peru 12 month gold gap, change on one year earlier, Jun 2026",2.01,points,BCRP
+pe_gap_X,KPI 2 red line: jump in the 12 month gap (2014 to 2016 mean + 2 SD),6.01,points,BCRP
+pe_gap_episode_1,KPI 2: first month of a red period (yyyymm),201710,yyyymm,BCRP
+pe_gap_episode_2,KPI 2: first month of a red period (yyyymm),202104,yyyymm,BCRP
+k3_res_ha_2025,"AMW new scar inside Tambopata National Reserve, 2025 (4 provisional quarters)",378.26,ha,AMW scar map + SERNANP
+k3_res_base_ha,"AMW new scar inside Tambopata National Reserve, largest whole year 2019 to 2024",55.61,ha,AMW scar map + SERNANP
+k3_res_base_n,"AMW detections inside Tambopata National Reserve, largest whole year 2019 to 2024",4,patches,AMW + SERNANP
+k3_res_q2_2026,"AMW new scar inside Tambopata National Reserve, 2026 Q2 (provisional)",694.93,ha,AMW scar map + SERNANP
+k3_first_red,KPI 3 reserve red line first crossed (yyyyq),20252,yyyyq,AMW scar map + SERNANP
+k3_ha25_tambopatainsidereserve,"AMW new scar, Tambopata (inside reserve) Q1 to Q3 2025",194.19,ha,AMW scar map + SERNANP
+k3_ha26_tambopatainsidereserve,"AMW new scar, Tambopata (inside reserve) Q1 to Q3 2026",965.94,ha,AMW scar map + SERNANP
+k3_n25_tambopatainsidereserve,"AMW detections, Tambopata (inside reserve) Q1 to Q3 2025",19,patches,AMW + SERNANP
+k3_n26_tambopatainsidereserve,"AMW detections, Tambopata (inside reserve) Q1 to Q3 2026",164,patches,AMW + SERNANP
+k3_chg_tambopatainsidereserve,"AMW new scar, Tambopata (inside reserve) Q1 to Q3 2026 vs 2025",397.43,%,AMW scar map + SERNANP
+k3_ha25_tambopatabufferzone,"AMW new scar, Tambopata buffer zone Q1 to Q3 2025",1365.16,ha,AMW scar map + SERNANP
+k3_ha26_tambopatabufferzone,"AMW new scar, Tambopata buffer zone Q1 to Q3 2026",2583.82,ha,AMW scar map + SERNANP
+k3_n25_tambopatabufferzone,"AMW detections, Tambopata buffer zone Q1 to Q3 2025",289,patches,AMW + SERNANP
+k3_n26_tambopatabufferzone,"AMW detections, Tambopata buffer zone Q1 to Q3 2026",481,patches,AMW + SERNANP
+k3_chg_tambopatabufferzone,"AMW new scar, Tambopata buffer zone Q1 to Q3 2026 vs 2025",89.27,%,AMW scar map + SERNANP
+k3_ha25_amarakaeribufferzone,"AMW new scar, Amarakaeri buffer zone Q1 to Q3 2025",338.45,ha,AMW scar map + SERNANP
+k3_ha26_amarakaeribufferzone,"AMW new scar, Amarakaeri buffer zone Q1 to Q3 2026",1078.11,ha,AMW scar map + SERNANP
+k3_n25_amarakaeribufferzone,"AMW detections, Amarakaeri buffer zone Q1 to Q3 2025",90,patches,AMW + SERNANP
+k3_n26_amarakaeribufferzone,"AMW detections, Amarakaeri buffer zone Q1 to Q3 2026",123,patches,AMW + SERNANP
+k3_chg_amarakaeribufferzone,"AMW new scar, Amarakaeri buffer zone Q1 to Q3 2026 vs 2025",218.54,%,AMW scar map + SERNANP
+k3_ha25_nativecommunitiesall,"AMW new scar, Native communities (all) Q1 to Q3 2025",745.14,ha,AMW scar map + SERNANP
+k3_ha26_nativecommunitiesall,"AMW new scar, Native communities (all) Q1 to Q3 2026",2204.79,ha,AMW scar map + SERNANP
+k3_n25_nativecommunitiesall,"AMW detections, Native communities (all) Q1 to Q3 2025",205,patches,AMW + SERNANP
+k3_n26_nativecommunitiesall,"AMW detections, Native communities (all) Q1 to Q3 2026",304,patches,AMW + SERNANP
+k3_chg_nativecommunitiesall,"AMW new scar, Native communities (all) Q1 to Q3 2026 vs 2025",195.89,%,AMW scar map + SERNANP
+k3_ha25_allmadrededios,"AMW new scar, All Madre de Dios Q1 to Q3 2025",8133.02,ha,AMW scar map + SERNANP
+k3_ha26_allmadrededios,"AMW new scar, All Madre de Dios Q1 to Q3 2026",11631.84,ha,AMW scar map + SERNANP
+k3_n25_allmadrededios,"AMW detections, All Madre de Dios Q1 to Q3 2025",1620,patches,AMW + SERNANP
+k3_n26_allmadrededios,"AMW detections, All Madre de Dios Q1 to Q3 2026",1907,patches,AMW + SERNANP
+k3_chg_allmadrededios,"AMW new scar, All Madre de Dios Q1 to Q3 2026 vs 2025",43.02,%,AMW scar map + SERNANP
+k3_ha25_restofmadrededios,"AMW new scar, Rest of Madre de Dios Q1 to Q3 2025",6235.23,ha,AMW scar map + SERNANP
+k3_ha26_restofmadrededios,"AMW new scar, Rest of Madre de Dios Q1 to Q3 2026",7003.98,ha,AMW scar map + SERNANP
+k3_n25_restofmadrededios,"AMW detections, Rest of Madre de Dios Q1 to Q3 2025",1222,patches,AMW + SERNANP
+k3_n26_restofmadrededios,"AMW detections, Rest of Madre de Dios Q1 to Q3 2026",1139,patches,AMW + SERNANP
+k3_chg_restofmadrededios,"AMW new scar, Rest of Madre de Dios Q1 to Q3 2026 vs 2025",12.33,%,AMW scar map + SERNANP
+k3_notitle_1924,"Share of new mining hectares in Madre de Dios with no mining title, 2019 to 2024 average of yearly shares",47,%,AMW scar map + SERNANP + INGEMMET
+k3_notitle_2026,"Share of new mining hectares in Madre de Dios with no mining title, 2026 Q1 to Q3",69,%,AMW scar map + SERNANP + INGEMMET
+shift_surge,"Share of new AMW patches in reserves or buffer zones, 2021 to 2023",16,%,Amazon Mining Watch + SERNANP
+shift_2026,"Share of new AMW patches in reserves or buffer zones, 2026 Q1 to Q3",40,%,Amazon Mining Watch + SERNANP
+k4_res_2025,"Forest to mining, 2025, Inside the reserves",175.39,ha,MapBiomas C4 transitions
+k4_res_lim_2025,"KPI 4 red line, 2025, Inside the reserves",52.25,ha,MapBiomas C4 transitions
+k4_za_2025,"Forest to mining, 2025, Buffer zones",2992.05,ha,MapBiomas C4 transitions
+k4_za_lim_2025,"KPI 4 red line, 2025, Buffer zones",2595.19,ha,MapBiomas C4 transitions
+k4_mdd_2025,"Forest to mining, 2025, All Madre de Dios",10308.19,ha,MapBiomas C4 transitions
+k4_mdd_lim_2025,"KPI 4 red line, 2025, All Madre de Dios",11677.41,ha,MapBiomas C4 transitions
+tamb_anp_2025,"Mining area inside Tambopata National Reserve, 2025",776.89,ha,MapBiomas C4 ANP
+tamb_anp_base,"Mining area inside Tambopata National Reserve, mean 2016 to 2020",449.37,ha,MapBiomas C4 ANP
+k5_2019,"New mining outside Madre de Dios, 2019",992.05,ha,AMW scar map + GADM
+k5_2024,"New mining outside Madre de Dios, 2024",1493.2,ha,AMW scar map + GADM
+k5_2025,"New mining outside Madre de Dios, 2025 (4 provisional quarters)",3303.97,ha,AMW scar map + GADM
+k5_huanuco_2019,"New mining in Huánuco, 2019",59.41,ha,AMW scar map + GADM
+k5_huanuco_2025,"New mining in Huánuco, 2025 (provisional)",1711.99,ha,AMW scar map + GADM
+k5_ytd25,"New mining outside Madre de Dios, Q1 to Q3 2025",2434.45,ha,AMW scar map + GADM
+k5_ytd26,"New mining outside Madre de Dios, Q1 to Q3 2026",2167.88,ha,AMW scar map + GADM
+k5_change,"New mining outside Madre de Dios, Q1 to Q3 2026 vs 2025",-10.95,%,AMW scar map + GADM
+k5_titled_2025,"Share of new mining outside Madre de Dios inside a mining concession, 2025",64.87,%,AMW scar map + INGEMMET
+k5_sira_2025,"Share of new mining outside Madre de Dios in the El Sira buffer zone, 2025",51.13,%,AMW scar map + SERNANP
+c4_peru_2022,"Mining area, Peru, 2022, as revised in Collection 4",143572.61,ha,MapBiomas C4
+c4_mdd_2022,"Mining area, Madre de Dios, 2022, as revised in Collection 4",74966.49,ha,MapBiomas C4
+rev_mdd_2022,"Revision of Madre de Dios 2022 mining area, Collection 4 vs Collection 2",-9.57,%,MapBiomas C4 vs C2 (typed)
+amw_chg_peru,"AMW new patches Q1 to Q3 2026 vs 2025, Peru",14.84,%,Amazon Mining Watch + GADM
+amw_chg_colombia,"AMW new patches Q1 to Q3 2026 vs 2025, Colombia",184.21,%,Amazon Mining Watch + GADM
+amw_chg_brazil,"AMW new patches Q1 to Q3 2026 vs 2025, Brazil",39.59,%,Amazon Mining Watch + GADM
+amw_chg_other_amazon_countries,"AMW new patches Q1 to Q3 2026 vs 2025, Other Amazon countries",-9.57,%,Amazon Mining Watch + GADM
+co_prod_2024,"Colombia declared gold production, 2024",62,t,ANM r85m-vv6c
+co_prod_2025,"Colombia declared gold production, 2025",51.3,t,ANM r85m-vv6c
+br_exp_2025,"Brazil gold exports, 2025",6.58,USD bn,UN Comtrade HS 7108
+co_coca_amz_2024,"Coca cultivation in Colombia's six Amazon departments, 2024",54314.27,ha,MinJusticia/SIMCI acs4-3wgp
+br_mal_garimpo_2022,"Brazil malaria cases caught in garimpo areas, 2022",23316,cases,"Ministério da Saúde, Tableau 'Dados para Cidadão'"
+br_mal_garimpo_2025,"Brazil malaria cases caught in garimpo areas, 2025",12989,cases,Ministério da Saúde
+br_mal_garimpo_2026,"Brazil malaria cases caught in garimpo areas, 2026 to early October",11835,cases,Ministério da Saúde
+br_avgas_bv_2021,"Aviation gasoline sales, Boa Vista, 2021",3207403,litres,ANP
+br_avgas_bv_2024,"Aviation gasoline sales, Boa Vista, 2024",126000,litres,ANP
+co_dredges_amazon_2025,"Dredges seized or destroyed in Colombia's six Amazon departments, 2025",117,dredges,MinDefensa dxs6-mdeg
+w2m_rest_2023,"Water to mining, rest of Peru, 2023",1337.51,ha,MapBiomas C4 transitions
+m2w_mdd_2023,"Mining to water, Madre de Dios, 2023",221.87,ha,MapBiomas C4 transitions
+maap233_mdd,"Cumulative mining deforestation, Madre de Dios, to mid 2025",135939,ha,MAAP #233 (29 Sep 2025) (typed by hand)
+maap233_loreto,"Dredges recorded in Loreto, 2017 to 2025",989,records,MAAP #233 (29 Sep 2025) (typed by hand)
+maap233_nanay,Dredges recorded on the Nanay river since 2017,841,records,MAAP #233 (29 Sep 2025) (typed by hand)
+maap233_nanay25,Dredges recorded on the Nanay river in 2025,275,records,MAAP #233 (29 Sep 2025) (typed by hand)
+maap233_amazonas,Dredges recorded in Amazonas region since 2017,174,records,MAAP #233 (29 Sep 2025) (typed by hand)
+maap233_water,"Water bodies with mining activity, Peruvian Amazon",225,rivers/streams,MAAP #233 (29 Sep 2025) (typed by hand)
+maap185_2122,"Mining deforestation, southern Peruvian Amazon, 2021 and 2022",18421,ha,MAAP #185 (15 Jun 2023) (typed by hand)
+maap195_2123,"Mining deforestation, southern Peruvian Amazon, 2021 to part of 2023",23881,ha,MAAP #195 (19 Nov 2023) (typed by hand)
+maap208_total,"Mining deforestation, southern Peruvian Amazon, Jan 2021 to Mar 2024",30846,ha,MAAP #208 (8 May 2024) (typed by hand)
+maap208_2123,"Mining deforestation, 2021 to 2023 (footnote 8)",28292,ha,MAAP #208 (8 May 2024) (typed by hand)
+maap208_outside,"Share outside the Mining Corridor, Jan 2021 to Mar 2024",26.2,%,MAAP #208 (8 May 2024) (typed by hand)
+maap208_cn,Share in native communities,14.6,%,MAAP #208 (8 May 2024) (typed by hand)
+maap208_za,Share in buffer zones of protected areas,7.9,%,MAAP #208 (8 May 2024) (typed by hand)
+maap241_2025,"Mining deforestation inside Tambopata National Reserve, 2025 (more than)",400,ha,MAAP #241 via Amazon Conservation (12 May 2026) (typed by hand)
+maap241_total,"Mining deforestation inside Tambopata National Reserve, 2025 to early 2026 (about)",500,ha,MAAP #241 via Amazon Conservation (12 May 2026) (typed by hand)
+maap241_struct,"Mining structures inside Tambopata National Reserve, Feb 2026",183,structures,MAAP #241 via Amazon Conservation (12 May 2026) (typed by hand)
+maap241_camps,"Mining camps inside Tambopata National Reserve, Feb 2026",67,camps,MAAP #241 via Amazon Conservation (12 May 2026) (typed by hand)
+amw_dash_peru,AMW dashboard: total area affected by mining in Peru until 2026 Q2,179900,ha,"amazonminingwatch.org dashboard, read on 15 Oct 2026 (shown as 179.9k) (typed by hand)"
+amw_dash_tamb,AMW dashboard: total area affected by mining in Tambopata National Reserve until 2026 Q2,2412,ha,"amazonminingwatch.org dashboard, read on 15 Oct 2026 (typed by hand)"
+amw_panorama_h1,"AMW newsletter: new mining deforestation inside Tambopata National Reserve, first half of 2026",786,ha,"Amazon Mining Watch Panorama, issue 2 (Oct 2026) (typed by hand)"
+gc_tamb_area,"Area with illegal mining activity inside Tambopata National Reserve, Oct 2025 to Jun 2026 (about)",1000,ha,"Global Conservation (M. Quispe), quoted by Mongabay Latam (27 Sep 2026) (typed by hand)"
+rami_tamb_julaug,"Forest lost inside Tambopata National Reserve, Jul to Aug 2026",1.68,ha,"SERNANP RAMI radar monitoring, quoted by Mongabay Latam (27 Sep 2026) (typed by hand)"
+bcrp_fx_sep2026,"Exchange rate, soles per USD, September 2026 average",3.38,S/ per USD,"BCRP series PN01234PM, read on the BCRP website on 15 Oct 2026 (typed by hand)"
+aa_records,"Dredge records in Loreto, 2025 to Jun 2026 (more than)",700,records,"Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary) (typed by hand)"
+aa_rivers,"Rivers in Loreto with dredges, 2025 to Jun 2026",13,rivers,"Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary) (typed by hand)"
+aa_nanay,"Dredge detections on the Nanay, 2025 to Jun 2026",421,detections,"Actualidad Ambiental (17 Aug 2026), reporting a MAAP report (secondary) (typed by hand)"
+c2_peru_2022,"Mining area, Peru, 2022, as published in Collection 2",169300,ha,MapBiomas Peru Collection 2 post (Feb 2024) (typed by hand)
+c2_mdd_2022,"Mining area, Madre de Dios, 2022, as published in Collection 2 (about)",82900,ha,MapBiomas Peru Collection 2 post (Feb 2024) (typed by hand)
+evoa_2025,"Colombia: land with alluvial gold exploitation (EVOA), 2025",118410,ha,MinEnergía/UNODC press release (2 Oct 2026) (typed by hand)
+evoa_illicit,"Colombia: share of EVOA area that is illicit, 2025",75,%,MinEnergía/UNODC press release (2 Oct 2026) (typed by hand)
+evoa_river_sectors,"Colombia: sectors with river mining alerts on 11 Amazon rivers, 2025",215,sectors,MinEnergía/UNODC press release (2 Oct 2026) (typed by hand)
+evoa_coca_overlap,"Colombia: share of EVOA area overlapping coca, 2025",48,%,MinEnergía/UNODC press release (2 Oct 2026) (typed by hand)
+escolhas_garimpo_2022,"Brazil: gold production registered by garimpos, 2022",30761,kg,"Instituto Escolhas note (Feb 2026), from ANM CFEM data (typed by hand)"
+escolhas_garimpo_2025,"Brazil: gold production registered by garimpos, 2025",5808,kg,"Instituto Escolhas note (Feb 2026), from ANM CFEM data (typed by hand)"

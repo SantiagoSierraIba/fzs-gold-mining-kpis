@@ -1,0 +1,827 @@
+BR Cod Mun Infecção,BR Mun de infecção ,BR UF Infecção,Year of BR Data de Notificação,Áreas especiais LPI (Sivep),Number of Records
+120001,Acrelândia,AC,2025,Em Branco,1
+120001,Acrelândia,AC,2025,Rural,2
+120001,Acrelândia,AC,2025,Assentamento,2
+120001,Acrelândia,AC,All,All,5
+120020,Cruzeiro do Sul,AC,2025,Em Branco,3
+120020,Cruzeiro do Sul,AC,2025,Ribeirinha,164
+120020,Cruzeiro do Sul,AC,2025,Urbana,186
+120020,Cruzeiro do Sul,AC,2025,Assentamento,257
+120020,Cruzeiro do Sul,AC,2025,Área indígena,319
+120020,Cruzeiro do Sul,AC,2025,Rural,"1,532"
+120020,Cruzeiro do Sul,AC,All,All,"2,461"
+120033,Mâncio Lima,AC,2025,Assentamento,7
+120033,Mâncio Lima,AC,2025,Área indígena,16
+120033,Mâncio Lima,AC,2025,Urbana,83
+120033,Mâncio Lima,AC,2025,Rural,160
+120033,Mâncio Lima,AC,All,All,266
+120035,Marechal Thaumaturgo,AC,2025,Rural,8
+120035,Marechal Thaumaturgo,AC,2025,Área indígena,20
+120035,Marechal Thaumaturgo,AC,All,All,28
+120038,Plácido de Castro,AC,2025,Em Branco,1
+120038,Plácido de Castro,AC,2025,Assentamento,8
+120038,Plácido de Castro,AC,2025,Rural,15
+120038,Plácido de Castro,AC,2025,Urbana,256
+120038,Plácido de Castro,AC,All,All,280
+120039,Porto Walter,AC,2025,Rural,3
+120039,Porto Walter,AC,2025,Área indígena,19
+120039,Porto Walter,AC,All,All,22
+120040,Rio Branco,AC,2025,Em Branco,4
+120040,Rio Branco,AC,2025,Urbana,6
+120040,Rio Branco,AC,2025,Rural,8
+120040,Rio Branco,AC,All,All,18
+120042,Rodrigues Alves,AC,2025,Urbana,1
+120042,Rodrigues Alves,AC,2025,Assentamento,1
+120042,Rodrigues Alves,AC,2025,Em Branco,1
+120042,Rodrigues Alves,AC,2025,Ribeirinha,2
+120042,Rodrigues Alves,AC,2025,Rural,114
+120042,Rodrigues Alves,AC,All,All,119
+120045,Senador Guiomard,AC,2025,Em Branco,1
+120045,Senador Guiomard,AC,2025,Assentamento,22
+120045,Senador Guiomard,AC,2025,Rural,93
+120045,Senador Guiomard,AC,All,All,116
+120060,Tarauacá,AC,2025,Assentamento,4
+120060,Tarauacá,AC,2025,Área indígena,10
+120060,Tarauacá,AC,2025,Rural,38
+120060,Tarauacá,AC,All,All,52
+Ignorado (AM),,AM,2025,Em Branco,5
+Ignorado (AM),,AM,All,All,5
+130002,Alvarães,AM,2025,Em Branco,7
+130002,Alvarães,AM,2025,Área indígena,93
+130002,Alvarães,AM,2025,Urbana,131
+130002,Alvarães,AM,2025,Rural,"1,261"
+130002,Alvarães,AM,All,All,"1,492"
+130006,Amaturá,AM,2025,Em Branco,1
+130006,Amaturá,AM,2025,Urbana,4
+130006,Amaturá,AM,2025,Rural,15
+130006,Amaturá,AM,2025,Área indígena,"2,225"
+130006,Amaturá,AM,All,All,"2,245"
+130014,Apuí,AM,2025,Urbana,9
+130014,Apuí,AM,2025,Em Branco,11
+130014,Apuí,AM,2025,Garimpo,12
+130014,Apuí,AM,2025,Rural,94
+130014,Apuí,AM,2025,Assentamento,98
+130014,Apuí,AM,All,All,224
+130020,Atalaia do Norte,AM,2025,Em Branco,2
+130020,Atalaia do Norte,AM,2025,Assentamento,20
+130020,Atalaia do Norte,AM,2025,Urbana,62
+130020,Atalaia do Norte,AM,2025,Rural,94
+130020,Atalaia do Norte,AM,2025,Ribeirinha,203
+130020,Atalaia do Norte,AM,2025,Área indígena,"1,485"
+130020,Atalaia do Norte,AM,All,All,"1,866"
+130030,Autazes,AM,2025,Em Branco,1
+130030,Autazes,AM,2025,Área indígena,6
+130030,Autazes,AM,2025,Rural,117
+130030,Autazes,AM,All,All,124
+130040,Barcelos,AM,2025,Em Branco,13
+130040,Barcelos,AM,2025,Rural,227
+130040,Barcelos,AM,2025,Urbana,"1,205"
+130040,Barcelos,AM,2025,Área indígena,"6,231"
+130040,Barcelos,AM,All,All,"7,676"
+130060,Benjamin Constant,AM,2025,Urbana,1
+130060,Benjamin Constant,AM,2025,Assentamento,1
+130060,Benjamin Constant,AM,2025,Em Branco,1
+130060,Benjamin Constant,AM,2025,Rural,63
+130060,Benjamin Constant,AM,2025,Área indígena,77
+130060,Benjamin Constant,AM,All,All,143
+130063,Beruri,AM,2025,Área indígena,6
+130063,Beruri,AM,2025,Rural,35
+130063,Beruri,AM,All,All,41
+130070,Boca do Acre,AM,2025,Em Branco,3
+130070,Boca do Acre,AM,2025,Urbana,4
+130070,Boca do Acre,AM,2025,Área indígena,18
+130070,Boca do Acre,AM,2025,Rural,135
+130070,Boca do Acre,AM,All,All,160
+130080,Borba,AM,2025,Assentamento,1
+130080,Borba,AM,2025,Área indígena,14
+130080,Borba,AM,2025,Rural,20
+130080,Borba,AM,2025,Garimpo,24
+130080,Borba,AM,All,All,59
+130090,Canutama,AM,2025,Em Branco,4
+130090,Canutama,AM,2025,Área indígena,17
+130090,Canutama,AM,2025,Assentamento,94
+130090,Canutama,AM,2025,Rural,940
+130090,Canutama,AM,All,All,"1,055"
+130100,Carauari,AM,2025,Em Branco,5
+130100,Carauari,AM,2025,Assentamento,89
+130100,Carauari,AM,2025,Área indígena,287
+130100,Carauari,AM,2025,Urbana,472
+130100,Carauari,AM,2025,Rural,"1,053"
+130100,Carauari,AM,All,All,"1,906"
+130110,Careiro,AM,2025,Urbana,1
+130110,Careiro,AM,2025,Área indígena,2
+130110,Careiro,AM,2025,Assentamento,2
+130110,Careiro,AM,2025,Rural,35
+130110,Careiro,AM,All,All,40
+130115,Careiro da Várzea,AM,2025,Em Branco,2
+130115,Careiro da Várzea,AM,2025,Rural,48
+130115,Careiro da Várzea,AM,All,All,50
+130120,Coari,AM,2025,Em Branco,4
+130120,Coari,AM,2025,Área indígena,10
+130120,Coari,AM,2025,Urbana,128
+130120,Coari,AM,2025,Rural,763
+130120,Coari,AM,All,All,905
+130140,Eirunepé,AM,2025,Em Branco,1
+130140,Eirunepé,AM,2025,Urbana,84
+130140,Eirunepé,AM,2025,Assentamento,208
+130140,Eirunepé,AM,2025,Área indígena,213
+130140,Eirunepé,AM,2025,Rural,458
+130140,Eirunepé,AM,All,All,964
+130150,Envira,AM,2025,Área indígena,2
+130150,Envira,AM,2025,Rural,39
+130150,Envira,AM,All,All,41
+130160,Fonte Boa,AM,2025,Urbana,6
+130160,Fonte Boa,AM,2025,Rural,23
+130160,Fonte Boa,AM,2025,Área indígena,24
+130160,Fonte Boa,AM,All,All,53
+130165,Guajará,AM,2025,Em Branco,2
+130165,Guajará,AM,2025,Assentamento,15
+130165,Guajará,AM,2025,Rural,"1,227"
+130165,Guajará,AM,All,All,"1,244"
+130170,Humaitá,AM,2025,Ribeirinha,1
+130170,Humaitá,AM,2025,Urbana,4
+130170,Humaitá,AM,2025,Em Branco,24
+130170,Humaitá,AM,2025,Assentamento,257
+130170,Humaitá,AM,2025,Área indígena,985
+130170,Humaitá,AM,2025,Rural,"1,183"
+130170,Humaitá,AM,All,All,"2,454"
+130180,Ipixuna,AM,2025,Urbana,8
+130180,Ipixuna,AM,2025,Rural,110
+130180,Ipixuna,AM,2025,Área indígena,172
+130180,Ipixuna,AM,All,All,290
+130185,Iranduba,AM,2025,Em Branco,4
+130185,Iranduba,AM,2025,Urbana,9
+130185,Iranduba,AM,2025,Rural,876
+130185,Iranduba,AM,All,All,889
+130190,Itacoatiara,AM,2025,Área indígena,1
+130190,Itacoatiara,AM,2025,Assentamento,1
+130190,Itacoatiara,AM,2025,Urbana,2
+130190,Itacoatiara,AM,2025,Em Branco,2
+130190,Itacoatiara,AM,2025,Rural,3
+130190,Itacoatiara,AM,All,All,9
+130195,Itamarati,AM,2025,Em Branco,1
+130195,Itamarati,AM,2025,Rural,406
+130195,Itamarati,AM,2025,Área indígena,569
+130195,Itamarati,AM,All,All,976
+130210,Japurá,AM,2025,Em Branco,3
+130210,Japurá,AM,2025,Urbana,74
+130210,Japurá,AM,2025,Garimpo,154
+130210,Japurá,AM,2025,Rural,197
+130210,Japurá,AM,2025,Área indígena,370
+130210,Japurá,AM,All,All,798
+130220,Juruá,AM,2025,Urbana,1
+130220,Juruá,AM,2025,Rural,11
+130220,Juruá,AM,2025,Área indígena,71
+130220,Juruá,AM,All,All,83
+130230,Jutaí,AM,2025,Urbana,60
+130230,Jutaí,AM,2025,Assentamento,205
+130230,Jutaí,AM,2025,Rural,394
+130230,Jutaí,AM,2025,Área indígena,628
+130230,Jutaí,AM,All,All,"1,287"
+130240,Lábrea,AM,2025,Em Branco,11
+130240,Lábrea,AM,2025,Ribeirinha,111
+130240,Lábrea,AM,2025,Urbana,257
+130240,Lábrea,AM,2025,Assentamento,368
+130240,Lábrea,AM,2025,Rural,401
+130240,Lábrea,AM,2025,Área indígena,871
+130240,Lábrea,AM,All,All,"2,019"
+130250,Manacapuru,AM,2025,Em Branco,2
+130250,Manacapuru,AM,2025,Rural,12
+130250,Manacapuru,AM,All,All,14
+130255,Manaquiri,AM,2025,Área indígena,1
+130255,Manaquiri,AM,All,All,1
+130260,Manaus,AM,2025,Área indígena,39
+130260,Manaus,AM,2025,Em Branco,62
+130260,Manaus,AM,2025,Assentamento,329
+130260,Manaus,AM,2025,Ribeirinha,394
+130260,Manaus,AM,2025,Urbana,551
+130260,Manaus,AM,2025,Rural,"7,049"
+130260,Manaus,AM,All,All,"8,424"
+130270,Manicoré,AM,2025,Em Branco,3
+130270,Manicoré,AM,2025,Assentamento,25
+130270,Manicoré,AM,2025,Rural,155
+130270,Manicoré,AM,2025,Área indígena,159
+130270,Manicoré,AM,All,All,342
+130280,Maraã,AM,2025,Em Branco,1
+130280,Maraã,AM,2025,Urbana,4
+130280,Maraã,AM,2025,Área indígena,13
+130280,Maraã,AM,2025,Rural,30
+130280,Maraã,AM,All,All,48
+130290,Maués,AM,2025,Em Branco,10
+130290,Maués,AM,2025,Área indígena,11
+130290,Maués,AM,2025,Assentamento,269
+130290,Maués,AM,2025,Rural,286
+130290,Maués,AM,2025,Garimpo,601
+130290,Maués,AM,All,All,"1,177"
+130310,Nova Olinda do Norte,AM,2025,Em Branco,1
+130310,Nova Olinda do Norte,AM,2025,Rural,2
+130310,Nova Olinda do Norte,AM,All,All,3
+130320,Novo Airão,AM,2025,Rural,5
+130320,Novo Airão,AM,All,All,5
+130330,Novo Aripuanã,AM,2025,Garimpo,34
+130330,Novo Aripuanã,AM,2025,Área indígena,62
+130330,Novo Aripuanã,AM,2025,Rural,277
+130330,Novo Aripuanã,AM,All,All,373
+130350,Pauini,AM,2025,Urbana,51
+130350,Pauini,AM,2025,Rural,70
+130350,Pauini,AM,2025,Área indígena,123
+130350,Pauini,AM,All,All,244
+130353,Presidente Figueiredo,AM,2025,Assentamento,1
+130353,Presidente Figueiredo,AM,2025,Rural,8
+130353,Presidente Figueiredo,AM,All,All,9
+130356,Rio Preto da Eva,AM,2025,Em Branco,1
+130356,Rio Preto da Eva,AM,2025,Área indígena,2
+130356,Rio Preto da Eva,AM,2025,Urbana,7
+130356,Rio Preto da Eva,AM,2025,Assentamento,12
+130356,Rio Preto da Eva,AM,2025,Rural,239
+130356,Rio Preto da Eva,AM,All,All,261
+130360,Santa Isabel do Rio Negro,AM,2025,Em Branco,1
+130360,Santa Isabel do Rio Negro,AM,2025,Urbana,5
+130360,Santa Isabel do Rio Negro,AM,2025,Ribeirinha,16
+130360,Santa Isabel do Rio Negro,AM,2025,Rural,42
+130360,Santa Isabel do Rio Negro,AM,2025,Área indígena,"3,513"
+130360,Santa Isabel do Rio Negro,AM,All,All,"3,577"
+130370,Santo Antônio do Içá,AM,2025,Em Branco,1
+130370,Santo Antônio do Içá,AM,2025,Urbana,2
+130370,Santo Antônio do Içá,AM,2025,Área indígena,215
+130370,Santo Antônio do Içá,AM,2025,Rural,"1,865"
+130370,Santo Antônio do Içá,AM,All,All,"2,083"
+130380,São Gabriel da Cachoeira,AM,2025,Em Branco,15
+130380,São Gabriel da Cachoeira,AM,2025,Urbana,813
+130380,São Gabriel da Cachoeira,AM,2025,Assentamento,"1,299"
+130380,São Gabriel da Cachoeira,AM,2025,Rural,"1,596"
+130380,São Gabriel da Cachoeira,AM,2025,Área indígena,"5,608"
+130380,São Gabriel da Cachoeira,AM,All,All,"9,331"
+130390,São Paulo de Olivença,AM,2025,Urbana,5
+130390,São Paulo de Olivença,AM,2025,Rural,39
+130390,São Paulo de Olivença,AM,2025,Área indígena,65
+130390,São Paulo de Olivença,AM,All,All,109
+130395,São Sebastião do Uatumã,AM,2025,Rural,1
+130395,São Sebastião do Uatumã,AM,All,All,1
+130400,Silves,AM,2025,Rural,1
+130400,Silves,AM,All,All,1
+130406,Tabatinga,AM,2025,Em Branco,4
+130406,Tabatinga,AM,2025,Assentamento,9
+130406,Tabatinga,AM,2025,Rural,11
+130406,Tabatinga,AM,2025,Urbana,16
+130406,Tabatinga,AM,2025,Área indígena,284
+130406,Tabatinga,AM,All,All,324
+130410,Tapauá,AM,2025,Em Branco,1
+130410,Tapauá,AM,2025,Urbana,310
+130410,Tapauá,AM,2025,Rural,493
+130410,Tapauá,AM,2025,Área indígena,556
+130410,Tapauá,AM,All,All,"1,360"
+130420,Tefé,AM,2025,Em Branco,6
+130420,Tefé,AM,2025,Urbana,341
+130420,Tefé,AM,2025,Área indígena,359
+130420,Tefé,AM,2025,Assentamento,663
+130420,Tefé,AM,2025,Rural,742
+130420,Tefé,AM,2025,Ribeirinha,"2,124"
+130420,Tefé,AM,All,All,"4,235"
+130423,Tonantins,AM,2025,Área indígena,1
+130423,Tonantins,AM,2025,Rural,3
+130423,Tonantins,AM,2025,Urbana,6
+130423,Tonantins,AM,All,All,10
+130426,Uarini,AM,2025,Em Branco,1
+130426,Uarini,AM,2025,Área indígena,49
+130426,Uarini,AM,2025,Urbana,144
+130426,Uarini,AM,2025,Rural,656
+130426,Uarini,AM,All,All,850
+160005,Serra do Navio,AP,2025,Urbana,1
+160005,Serra do Navio,AP,2025,Assentamento,2
+160005,Serra do Navio,AP,2025,Rural,36
+160005,Serra do Navio,AP,2025,Garimpo,103
+160005,Serra do Navio,AP,All,All,142
+160010,Amapá,AP,2025,Rural,4
+160010,Amapá,AP,2025,Em Branco,8
+160010,Amapá,AP,All,All,12
+160015,Pedra Branca do Amapari,AP,2025,Em Branco,1
+160015,Pedra Branca do Amapari,AP,2025,Assentamento,6
+160015,Pedra Branca do Amapari,AP,2025,Urbana,33
+160015,Pedra Branca do Amapari,AP,2025,Rural,78
+160015,Pedra Branca do Amapari,AP,2025,Área indígena,80
+160015,Pedra Branca do Amapari,AP,2025,Garimpo,101
+160015,Pedra Branca do Amapari,AP,All,All,299
+160020,Calçoene,AP,2025,Urbana,7
+160020,Calçoene,AP,2025,Em Branco,22
+160020,Calçoene,AP,2025,Rural,103
+160020,Calçoene,AP,2025,Garimpo,"2,193"
+160020,Calçoene,AP,All,All,"2,325"
+160021,Cutias,AP,2025,Urbana,1
+160021,Cutias,AP,All,All,1
+160023,Ferreira Gomes,AP,2025,Assentamento,1
+160023,Ferreira Gomes,AP,2025,Rural,37
+160023,Ferreira Gomes,AP,All,All,38
+160025,Itaubal,AP,2025,Rural,1
+160025,Itaubal,AP,All,All,1
+160027,Laranjal do Jari,AP,2025,Garimpo,4
+160027,Laranjal do Jari,AP,2025,Rural,5
+160027,Laranjal do Jari,AP,2025,Em Branco,6
+160027,Laranjal do Jari,AP,All,All,15
+160030,Macapá,AP,2025,Em Branco,21
+160030,Macapá,AP,2025,Rural,40
+160030,Macapá,AP,2025,Urbana,120
+160030,Macapá,AP,All,All,181
+160040,Mazagão,AP,2025,Garimpo,1
+160040,Mazagão,AP,2025,Em Branco,1
+160040,Mazagão,AP,2025,Rural,29
+160040,Mazagão,AP,All,All,31
+160050,Oiapoque,AP,2025,Em Branco,13
+160050,Oiapoque,AP,2025,Rural,54
+160050,Oiapoque,AP,2025,Urbana,112
+160050,Oiapoque,AP,2025,Área indígena,156
+160050,Oiapoque,AP,2025,Garimpo,"1,013"
+160050,Oiapoque,AP,All,All,"1,348"
+160053,Porto Grande,AP,2025,Assentamento,1
+160053,Porto Grande,AP,2025,Urbana,2
+160053,Porto Grande,AP,2025,Em Branco,2
+160053,Porto Grande,AP,2025,Garimpo,43
+160053,Porto Grande,AP,2025,Rural,209
+160053,Porto Grande,AP,All,All,257
+160055,Pracuúba,AP,2025,Rural,3
+160055,Pracuúba,AP,All,All,3
+160060,Santana,AP,2025,Assentamento,1
+160060,Santana,AP,2025,Rural,9
+160060,Santana,AP,2025,Urbana,10
+160060,Santana,AP,All,All,20
+160070,Tartarugalzinho,AP,2025,Em Branco,1
+160070,Tartarugalzinho,AP,2025,Assentamento,2
+160070,Tartarugalzinho,AP,2025,Urbana,5
+160070,Tartarugalzinho,AP,2025,Garimpo,7
+160070,Tartarugalzinho,AP,2025,Rural,16
+160070,Tartarugalzinho,AP,All,All,31
+230370,Caucaia,CE,2025,Em Branco,1
+230370,Caucaia,CE,All,All,1
+320190,Domingos Martins,ES,2025,Em Branco,1
+320190,Domingos Martins,ES,All,All,1
+320225,Governador Lindenberg,ES,2025,Em Branco,1
+320225,Governador Lindenberg,ES,All,All,1
+320290,Itarana,ES,2025,Em Branco,1
+320290,Itarana,ES,All,All,1
+520860,Goianésia,GO,2025,Em Branco,1
+520860,Goianésia,GO,All,All,1
+210043,Alto Alegre do Maranhão,MA,2025,Em Branco,1
+210043,Alto Alegre do Maranhão,MA,All,All,1
+210055,Amapá do Maranhão,MA,2025,Em Branco,1
+210055,Amapá do Maranhão,MA,All,All,1
+210060,Amarante do Maranhão,MA,2025,Rural,7
+210060,Amarante do Maranhão,MA,All,All,7
+210317,Centro Novo do Maranhão,MA,2025,Assentamento,1
+210317,Centro Novo do Maranhão,MA,All,All,1
+210570,Lago da Pedra,MA,2025,Rural,1
+210570,Lago da Pedra,MA,All,All,1
+210810,Paulo Ramos,MA,2025,Urbana,1
+210810,Paulo Ramos,MA,All,All,1
+210980,Santa Helena,MA,2025,Rural,4
+210980,Santa Helena,MA,All,All,4
+210990,Santa Inês,MA,2025,Rural,1
+210990,Santa Inês,MA,All,All,1
+211000,Santa Luzia,MA,2025,Rural,1
+211000,Santa Luzia,MA,2025,Em Branco,1
+211000,Santa Luzia,MA,All,All,2
+211245,Turilândia,MA,2025,Rural,2
+211245,Turilândia,MA,All,All,2
+314450,Nazareno,MG,2025,Em Branco,1
+314450,Nazareno,MG,All,All,1
+510025,Alta Floresta,MT,2025,Rural,1
+510025,Alta Floresta,MT,All,All,1
+510080,Apiacás,MT,2025,Rural,4
+510080,Apiacás,MT,2025,Área indígena,5
+510080,Apiacás,MT,All,All,9
+510140,Aripuanã,MT,2025,Garimpo,2
+510140,Aripuanã,MT,2025,Em Branco,4
+510140,Aripuanã,MT,2025,Rural,8
+510140,Aripuanã,MT,2025,Área indígena,250
+510140,Aripuanã,MT,All,All,264
+510160,Barão de Melgaço,MT,2025,Em Branco,1
+510160,Barão de Melgaço,MT,All,All,1
+510190,Brasnorte,MT,2025,Rural,1
+510190,Brasnorte,MT,All,All,1
+510260,Campinápolis,MT,2025,Em Branco,2
+510260,Campinápolis,MT,All,All,2
+510279,Carlinda,MT,2025,Em Branco,1
+510279,Carlinda,MT,All,All,1
+510320,Colíder,MT,2025,Urbana,1
+510320,Colíder,MT,All,All,1
+510325,Colniza,MT,2025,Em Branco,18
+510325,Colniza,MT,2025,Garimpo,79
+510325,Colniza,MT,2025,Rural,121
+510325,Colniza,MT,All,All,218
+510330,Comodoro,MT,2025,Área indígena,1
+510330,Comodoro,MT,All,All,1
+510336,Conquista D'Oeste,MT,2025,Em Branco,1
+510336,Conquista D'Oeste,MT,2025,Garimpo,20
+510336,Conquista D'Oeste,MT,2025,Área indígena,66
+510336,Conquista D'Oeste,MT,All,All,87
+510337,Cotriguaçu,MT,2025,Rural,103
+510337,Cotriguaçu,MT,All,All,103
+510340,Cuiabá,MT,2025,Em Branco,3
+510340,Cuiabá,MT,All,All,3
+510515,Juína,MT,2025,Área indígena,11
+510515,Juína,MT,All,All,11
+510517,Juruena,MT,2025,Urbana,1
+510517,Juruena,MT,2025,Assentamento,1
+510517,Juruena,MT,2025,Em Branco,1
+510517,Juruena,MT,All,All,3
+510550,Vila Bela da Santíssima Trindade,MT,2025,Rural,2
+510550,Vila Bela da Santíssima Trindade,MT,2025,Em Branco,2
+510550,Vila Bela da Santíssima Trindade,MT,2025,Garimpo,115
+510550,Vila Bela da Santíssima Trindade,MT,All,All,119
+510558,Marcelândia,MT,2025,Em Branco,1
+510558,Marcelândia,MT,All,All,1
+510560,Matupá,MT,2025,Rural,1
+510560,Matupá,MT,All,All,1
+510615,Nova Bandeirantes,MT,2025,Garimpo,20
+510615,Nova Bandeirantes,MT,All,All,20
+510618,Nova Lacerda,MT,2025,Rural,1
+510618,Nova Lacerda,MT,2025,Garimpo,1
+510618,Nova Lacerda,MT,2025,Em Branco,1
+510618,Nova Lacerda,MT,All,All,3
+510621,Nova Canaã do Norte,MT,2025,Em Branco,1
+510621,Nova Canaã do Norte,MT,All,All,1
+510622,Nova Mutum,MT,2025,Em Branco,1
+510622,Nova Mutum,MT,All,All,1
+510626,Novo Mundo,MT,2025,Garimpo,1
+510626,Novo Mundo,MT,2025,Em Branco,1
+510626,Novo Mundo,MT,All,All,2
+510629,Paranaíta,MT,2025,Rural,3
+510629,Paranaíta,MT,All,All,3
+510642,Peixoto de Azevedo,MT,2025,Rural,5
+510642,Peixoto de Azevedo,MT,2025,Em Branco,7
+510642,Peixoto de Azevedo,MT,2025,Área indígena,10
+510642,Peixoto de Azevedo,MT,2025,Garimpo,14
+510642,Peixoto de Azevedo,MT,All,All,36
+510675,Pontes e Lacerda,MT,2025,Garimpo,1
+510675,Pontes e Lacerda,MT,2025,Em Branco,5
+510675,Pontes e Lacerda,MT,All,All,6
+510680,Porto dos Gaúchos,MT,2025,Urbana,1
+510680,Porto dos Gaúchos,MT,All,All,1
+510685,Porto Estrela,MT,2025,Em Branco,1
+510685,Porto Estrela,MT,All,All,1
+510735,São José do Xingu,MT,2025,Área indígena,5
+510735,São José do Xingu,MT,All,All,5
+510757,Rondolândia,MT,2025,Em Branco,1
+510757,Rondolândia,MT,2025,Rural,3
+510757,Rondolândia,MT,2025,Área indígena,72
+510757,Rondolândia,MT,All,All,76
+510805,Terra Nova do Norte,MT,2025,Rural,1
+510805,Terra Nova do Norte,MT,2025,Em Branco,1
+510805,Terra Nova do Norte,MT,All,All,2
+510880,Nova Guarita,MT,2025,Rural,1
+510880,Nova Guarita,MT,2025,Em Branco,1
+510880,Nova Guarita,MT,All,All,2
+Ignorado (PA),,PA,2025,Em Branco,1
+Ignorado (PA),,PA,All,All,1
+150030,Afuá,PA,2025,Urbana,2
+150030,Afuá,PA,2025,Rural,93
+150030,Afuá,PA,All,All,95
+150040,Alenquer,PA,2025,Rural,128
+150040,Alenquer,PA,All,All,128
+150050,Almeirim,PA,2025,Rural,15
+150050,Almeirim,PA,2025,Área indígena,117
+150050,Almeirim,PA,2025,Garimpo,198
+150050,Almeirim,PA,All,All,330
+150060,Altamira,PA,2025,Assentamento,1
+150060,Altamira,PA,2025,Em Branco,5
+150060,Altamira,PA,2025,Urbana,54
+150060,Altamira,PA,2025,Garimpo,159
+150060,Altamira,PA,2025,Rural,184
+150060,Altamira,PA,2025,Área indígena,346
+150060,Altamira,PA,All,All,749
+150070,Anajás,PA,2025,Em Branco,3
+150070,Anajás,PA,2025,Urbana,6
+150070,Anajás,PA,2025,Ribeirinha,571
+150070,Anajás,PA,All,All,580
+150085,Anapu,PA,2025,Urbana,1
+150085,Anapu,PA,2025,Em Branco,1
+150085,Anapu,PA,2025,Garimpo,3
+150085,Anapu,PA,All,All,5
+150100,Aveiro,PA,2025,Área indígena,1
+150100,Aveiro,PA,2025,Rural,1
+150100,Aveiro,PA,2025,Urbana,1
+150100,Aveiro,PA,All,All,3
+150110,Bagre,PA,2025,Em Branco,3
+150110,Bagre,PA,2025,Urbana,7
+150110,Bagre,PA,2025,Rural,892
+150110,Bagre,PA,All,All,902
+150120,Baião,PA,2025,Assentamento,1
+150120,Baião,PA,2025,Rural,13
+150120,Baião,PA,All,All,14
+150125,Bannach,PA,2025,Rural,1
+150125,Bannach,PA,2025,Garimpo,1
+150125,Bannach,PA,All,All,2
+150140,Belém,PA,2025,Urbana,1
+150140,Belém,PA,2025,Em Branco,4
+150140,Belém,PA,All,All,5
+150157,Bom Jesus do Tocantins,PA,2025,Assentamento,1
+150157,Bom Jesus do Tocantins,PA,2025,Rural,2
+150157,Bom Jesus do Tocantins,PA,All,All,3
+150172,Brasil Novo,PA,2025,Em Branco,1
+150172,Brasil Novo,PA,All,All,1
+150180,Breves,PA,2025,Urbana,1
+150180,Breves,PA,2025,Em Branco,1
+150180,Breves,PA,2025,Ribeirinha,293
+150180,Breves,PA,2025,Rural,407
+150180,Breves,PA,All,All,702
+150200,Cachoeira do Arari,PA,2025,Rural,1
+150200,Cachoeira do Arari,PA,All,All,1
+150210,Cametá,PA,2025,Rural,123
+150210,Cametá,PA,All,All,123
+150215,Canaã dos Carajás,PA,2025,Em Branco,1
+150215,Canaã dos Carajás,PA,All,All,1
+150230,Capitão Poço,PA,2025,Rural,1
+150230,Capitão Poço,PA,All,All,1
+150250,Chaves,PA,2025,Rural,111
+150250,Chaves,PA,All,All,111
+150276,Cumaru do Norte,PA,2025,Rural,1
+150276,Cumaru do Norte,PA,2025,Área indígena,8
+150276,Cumaru do Norte,PA,2025,Garimpo,9
+150276,Cumaru do Norte,PA,All,All,18
+150280,Curralinho,PA,2025,Em Branco,1
+150280,Curralinho,PA,2025,Ribeirinha,49
+150280,Curralinho,PA,All,All,50
+150304,Floresta do Araguaia,PA,2025,Em Branco,1
+150304,Floresta do Araguaia,PA,All,All,1
+150310,Gurupá,PA,2025,Urbana,2
+150310,Gurupá,PA,All,All,2
+150360,Itaituba,PA,2025,Urbana,5
+150360,Itaituba,PA,2025,Área indígena,12
+150360,Itaituba,PA,2025,Em Branco,26
+150360,Itaituba,PA,2025,Rural,547
+150360,Itaituba,PA,2025,Garimpo,"3,781"
+150360,Itaituba,PA,All,All,"4,371"
+150370,Itupiranga,PA,2025,Em Branco,1
+150370,Itupiranga,PA,All,All,1
+150375,Jacareacanga,PA,2025,Em Branco,90
+150375,Jacareacanga,PA,2025,Urbana,375
+150375,Jacareacanga,PA,2025,Rural,722
+150375,Jacareacanga,PA,2025,Garimpo,"3,292"
+150375,Jacareacanga,PA,2025,Área indígena,"5,157"
+150375,Jacareacanga,PA,All,All,"9,636"
+150400,Limoeiro do Ajuru,PA,2025,Rural,10
+150400,Limoeiro do Ajuru,PA,All,All,10
+150445,Medicilândia,PA,2025,Rural,4
+150445,Medicilândia,PA,All,All,4
+150460,Mocajuba,PA,2025,Rural,4
+150460,Mocajuba,PA,All,All,4
+150475,Mojuí dos Campos,PA,2025,Rural,1
+150475,Mojuí dos Campos,PA,All,All,1
+150480,Monte Alegre,PA,2025,Rural,1
+150480,Monte Alegre,PA,All,All,1
+150503,Novo Progresso,PA,2025,Área indígena,1
+150503,Novo Progresso,PA,2025,Rural,5
+150503,Novo Progresso,PA,2025,Em Branco,25
+150503,Novo Progresso,PA,2025,Garimpo,65
+150503,Novo Progresso,PA,All,All,96
+150506,Novo Repartimento,PA,2025,Rural,1
+150506,Novo Repartimento,PA,All,All,1
+150510,Óbidos,PA,2025,Rural,45
+150510,Óbidos,PA,All,All,45
+150520,Oeiras do Pará,PA,2025,Urbana,4
+150520,Oeiras do Pará,PA,2025,Em Branco,8
+150520,Oeiras do Pará,PA,2025,Rural,"1,524"
+150520,Oeiras do Pará,PA,All,All,"1,536"
+150530,Oriximiná,PA,2025,Garimpo,17
+150530,Oriximiná,PA,2025,Área indígena,35
+150530,Oriximiná,PA,2025,Rural,73
+150530,Oriximiná,PA,All,All,125
+150543,Ourilândia do Norte,PA,2025,Garimpo,13
+150543,Ourilândia do Norte,PA,All,All,13
+150548,Pacajá,PA,2025,Assentamento,4
+150548,Pacajá,PA,All,All,4
+150553,Parauapebas,PA,2025,Garimpo,1
+150553,Parauapebas,PA,2025,Urbana,1
+150553,Parauapebas,PA,2025,Em Branco,1
+150553,Parauapebas,PA,2025,Rural,25
+150553,Parauapebas,PA,All,All,28
+150580,Portel,PA,2025,Em Branco,1
+150580,Portel,PA,2025,Rural,53
+150580,Portel,PA,All,All,54
+150619,Rurópolis,PA,2025,Rural,6
+150619,Rurópolis,PA,All,All,6
+150670,Santana do Araguaia,PA,2025,Em Branco,1
+150670,Santana do Araguaia,PA,All,All,1
+150680,Santarém,PA,2025,Em Branco,1
+150680,Santarém,PA,All,All,1
+150730,São Félix do Xingu,PA,2025,Em Branco,1
+150730,São Félix do Xingu,PA,All,All,1
+150770,São Sebastião da Boa Vista,PA,2025,Em Branco,1
+150770,São Sebastião da Boa Vista,PA,All,All,1
+150780,Senador José Porfírio,PA,2025,Rural,1
+150780,Senador José Porfírio,PA,2025,Garimpo,3
+150780,Senador José Porfírio,PA,All,All,4
+150805,Trairão,PA,2025,Garimpo,1
+150805,Trairão,PA,2025,Urbana,1
+150805,Trairão,PA,2025,Rural,12
+150805,Trairão,PA,All,All,14
+150808,Tucumã,PA,2025,Rural,1
+150808,Tucumã,PA,2025,Em Branco,1
+150808,Tucumã,PA,2025,Garimpo,4
+150808,Tucumã,PA,All,All,6
+150815,Uruará,PA,2025,Rural,1
+150815,Uruará,PA,2025,Em Branco,2
+150815,Uruará,PA,All,All,3
+150835,Vitória do Xingu,PA,2025,Rural,1
+150835,Vitória do Xingu,PA,2025,Em Branco,1
+150835,Vitória do Xingu,PA,All,All,2
+260000,,PE,2025,Em Branco,1
+260000,,PE,All,All,1
+221100,Teresina,PI,2025,Em Branco,1
+221100,Teresina,PI,All,All,1
+330010,Angra dos Reis,RJ,2025,Em Branco,2
+330010,Angra dos Reis,RJ,All,All,2
+330050,Bom Jardim,RJ,2025,Em Branco,1
+330050,Bom Jardim,RJ,All,All,1
+330390,Petrópolis,RJ,2025,Em Branco,1
+330390,Petrópolis,RJ,All,All,1
+Ignorado (RO),,RO,2025,Em Branco,2
+Ignorado (RO),,RO,All,All,2
+110002,Ariquemes,RO,2025,Rural,1
+110002,Ariquemes,RO,2025,Em Branco,10
+110002,Ariquemes,RO,2025,Urbana,16
+110002,Ariquemes,RO,2025,Garimpo,19
+110002,Ariquemes,RO,2025,Assentamento,25
+110002,Ariquemes,RO,All,All,71
+110004,Cacoal,RO,2025,Área indígena,1
+110004,Cacoal,RO,All,All,1
+110005,Cerejeiras,RO,2025,Em Branco,1
+110005,Cerejeiras,RO,All,All,1
+110008,Costa Marques,RO,2025,Urbana,1
+110008,Costa Marques,RO,All,All,1
+110009,Espigão D'Oeste,RO,2025,Em Branco,1
+110009,Espigão D'Oeste,RO,2025,Rural,3
+110009,Espigão D'Oeste,RO,2025,Área indígena,14
+110009,Espigão D'Oeste,RO,All,All,18
+110010,Guajará-Mirim,RO,2025,Em Branco,5
+110010,Guajará-Mirim,RO,2025,Urbana,22
+110010,Guajará-Mirim,RO,2025,Rural,106
+110010,Guajará-Mirim,RO,2025,Área indígena,434
+110010,Guajará-Mirim,RO,All,All,567
+110011,Jaru,RO,2025,Em Branco,2
+110011,Jaru,RO,All,All,2
+110012,Ji-Paraná,RO,2025,Em Branco,2
+110012,Ji-Paraná,RO,All,All,2
+110013,Machadinho D'Oeste,RO,2025,Urbana,16
+110013,Machadinho D'Oeste,RO,2025,Em Branco,21
+110013,Machadinho D'Oeste,RO,2025,Assentamento,57
+110013,Machadinho D'Oeste,RO,2025,Rural,96
+110013,Machadinho D'Oeste,RO,All,All,190
+110014,Nova Brasilândia D'Oeste,RO,2025,Rural,3
+110014,Nova Brasilândia D'Oeste,RO,All,All,3
+110020,Porto Velho,RO,2025,Garimpo,37
+110020,Porto Velho,RO,2025,Área indígena,43
+110020,Porto Velho,RO,2025,Em Branco,45
+110020,Porto Velho,RO,2025,Assentamento,267
+110020,Porto Velho,RO,2025,Urbana,"1,161"
+110020,Porto Velho,RO,2025,Rural,"2,909"
+110020,Porto Velho,RO,All,All,"4,462"
+110026,Rio Crespo,RO,2025,Urbana,1
+110026,Rio Crespo,RO,2025,Em Branco,8
+110026,Rio Crespo,RO,2025,Rural,31
+110026,Rio Crespo,RO,All,All,40
+110030,Vilhena,RO,2025,Urbana,1
+110030,Vilhena,RO,2025,Área indígena,2
+110030,Vilhena,RO,All,All,3
+110032,São Miguel do Guaporé,RO,2025,Rural,1
+110032,São Miguel do Guaporé,RO,All,All,1
+110033,Nova Mamoré,RO,2025,Garimpo,1
+110033,Nova Mamoré,RO,2025,Em Branco,3
+110033,Nova Mamoré,RO,2025,Assentamento,11
+110033,Nova Mamoré,RO,2025,Urbana,15
+110033,Nova Mamoré,RO,2025,Rural,32
+110033,Nova Mamoré,RO,2025,Área indígena,139
+110033,Nova Mamoré,RO,All,All,201
+110040,Alto Paraíso,RO,2025,Em Branco,1
+110040,Alto Paraíso,RO,2025,Urbana,20
+110040,Alto Paraíso,RO,2025,Rural,83
+110040,Alto Paraíso,RO,All,All,104
+110045,Buritis,RO,2025,Assentamento,1
+110045,Buritis,RO,All,All,1
+110070,Campo Novo de Rondônia,RO,2025,Em Branco,1
+110070,Campo Novo de Rondônia,RO,2025,Rural,21
+110070,Campo Novo de Rondônia,RO,All,All,22
+110080,Candeias do Jamari,RO,2025,Área indígena,1
+110080,Candeias do Jamari,RO,2025,Em Branco,10
+110080,Candeias do Jamari,RO,2025,Urbana,163
+110080,Candeias do Jamari,RO,2025,Assentamento,229
+110080,Candeias do Jamari,RO,2025,Rural,429
+110080,Candeias do Jamari,RO,All,All,832
+110094,Cujubim,RO,2025,Em Branco,5
+110094,Cujubim,RO,2025,Urbana,7
+110094,Cujubim,RO,2025,Rural,209
+110094,Cujubim,RO,All,All,221
+110110,Itapuã do Oeste,RO,2025,Urbana,9
+110110,Itapuã do Oeste,RO,2025,Em Branco,14
+110110,Itapuã do Oeste,RO,2025,Assentamento,19
+110110,Itapuã do Oeste,RO,2025,Rural,108
+110110,Itapuã do Oeste,RO,2025,Garimpo,521
+110110,Itapuã do Oeste,RO,All,All,671
+110140,Monte Negro,RO,2025,Garimpo,2
+110140,Monte Negro,RO,2025,Rural,5
+110140,Monte Negro,RO,All,All,7
+110150,Seringueiras,RO,2025,Rural,1
+110150,Seringueiras,RO,2025,Urbana,1
+110150,Seringueiras,RO,All,All,2
+110160,Theobroma,RO,2025,Rural,1
+110160,Theobroma,RO,All,All,1
+110175,Vale do Anari,RO,2025,Urbana,1
+110175,Vale do Anari,RO,2025,Rural,3
+110175,Vale do Anari,RO,All,All,4
+Ignorado (RR),,RR,2025,Em Branco,3
+Ignorado (RR),,RR,All,All,3
+140002,Amajari,RR,2025,Assentamento,8
+140002,Amajari,RR,2025,Em Branco,10
+140002,Amajari,RR,2025,Urbana,14
+140002,Amajari,RR,2025,Garimpo,125
+140002,Amajari,RR,2025,Rural,174
+140002,Amajari,RR,2025,Área indígena,"6,630"
+140002,Amajari,RR,All,All,"6,961"
+140005,Alto Alegre,RR,2025,Urbana,1
+140005,Alto Alegre,RR,2025,Em Branco,2
+140005,Alto Alegre,RR,2025,Assentamento,9
+140005,Alto Alegre,RR,2025,Rural,50
+140005,Alto Alegre,RR,2025,Garimpo,104
+140005,Alto Alegre,RR,2025,Área indígena,"7,617"
+140005,Alto Alegre,RR,All,All,"7,783"
+140010,Boa Vista,RR,2025,Área indígena,3
+140010,Boa Vista,RR,2025,Urbana,5
+140010,Boa Vista,RR,2025,Rural,6
+140010,Boa Vista,RR,2025,Em Branco,19
+140010,Boa Vista,RR,All,All,33
+140015,Bonfim,RR,2025,Assentamento,1
+140015,Bonfim,RR,2025,Rural,13
+140015,Bonfim,RR,2025,Área indígena,20
+140015,Bonfim,RR,All,All,34
+140017,Cantá,RR,2025,Em Branco,2
+140017,Cantá,RR,2025,Urbana,13
+140017,Cantá,RR,2025,Área indígena,51
+140017,Cantá,RR,2025,Assentamento,75
+140017,Cantá,RR,2025,Rural,84
+140017,Cantá,RR,All,All,225
+140020,Caracaraí,RR,2025,Em Branco,1
+140020,Caracaraí,RR,2025,Urbana,2
+140020,Caracaraí,RR,2025,Assentamento,2
+140020,Caracaraí,RR,2025,Rural,10
+140020,Caracaraí,RR,2025,Garimpo,10
+140020,Caracaraí,RR,2025,Área indígena,"2,443"
+140020,Caracaraí,RR,All,All,"2,468"
+140023,Caroebe,RR,2025,Urbana,1
+140023,Caroebe,RR,2025,Área indígena,2
+140023,Caroebe,RR,2025,Rural,2
+140023,Caroebe,RR,2025,Assentamento,202
+140023,Caroebe,RR,All,All,207
+140028,Iracema,RR,2025,Urbana,1
+140028,Iracema,RR,2025,Garimpo,3
+140028,Iracema,RR,2025,Rural,19
+140028,Iracema,RR,2025,Assentamento,34
+140028,Iracema,RR,2025,Área indígena,813
+140028,Iracema,RR,All,All,870
+140030,Mucajaí,RR,2025,Em Branco,2
+140030,Mucajaí,RR,2025,Urbana,3
+140030,Mucajaí,RR,2025,Assentamento,6
+140030,Mucajaí,RR,2025,Rural,44
+140030,Mucajaí,RR,2025,Garimpo,74
+140030,Mucajaí,RR,2025,Área indígena,283
+140030,Mucajaí,RR,All,All,412
+140040,Normandia,RR,2025,Área indígena,10
+140040,Normandia,RR,All,All,10
+140045,Pacaraima,RR,2025,Em Branco,5
+140045,Pacaraima,RR,2025,Área indígena,207
+140045,Pacaraima,RR,All,All,212
+140047,Rorainópolis,RR,2025,Em Branco,3
+140047,Rorainópolis,RR,2025,Urbana,7
+140047,Rorainópolis,RR,2025,Rural,62
+140047,Rorainópolis,RR,All,All,72
+140050,São João da Baliza,RR,2025,Área indígena,1
+140050,São João da Baliza,RR,2025,Em Branco,1
+140050,São João da Baliza,RR,2025,Assentamento,3
+140050,São João da Baliza,RR,2025,Urbana,21
+140050,São João da Baliza,RR,2025,Rural,26
+140050,São João da Baliza,RR,All,All,52
+140060,São Luiz,RR,2025,Área indígena,5
+140060,São Luiz,RR,2025,Assentamento,18
+140060,São Luiz,RR,2025,Rural,36
+140060,São Luiz,RR,All,All,59
+140070,Uiramutã,RR,2025,Em Branco,1
+140070,Uiramutã,RR,2025,Garimpo,3
+140070,Uiramutã,RR,2025,Rural,6
+140070,Uiramutã,RR,2025,Área indígena,422
+140070,Uiramutã,RR,All,All,432
+430064,Ametista do Sul,RS,2025,Em Branco,1
+430064,Ametista do Sul,RS,All,All,1
+420910,Joinville,SC,2025,Em Branco,1
+420910,Joinville,SC,All,All,1
+421740,Schroeder,SC,2025,Em Branco,1
+421740,Schroeder,SC,All,All,1
+350950,Campinas,SP,2025,Em Branco,1
+350950,Campinas,SP,All,All,1
+355030,São Paulo,SP,2025,Em Branco,3
+355030,São Paulo,SP,All,All,3
+All,All,All,2025,Em Branco,740
+All,All,All,2025,Ribeirinha,"3,928"
+All,All,All,2025,Assentamento,"5,256"
+All,All,All,2025,Urbana,"7,567"
+All,All,All,2025,Garimpo,"12,989"
+All,All,All,2025,Rural,"36,262"
+All,All,All,2025,Área indígena,"51,295"
+All,All,All,All,All,"118,037"
