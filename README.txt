@@ -16,11 +16,12 @@ Software:      R 4.6.1 with tidyverse, readxl, jsonlite, sf, terra, patchwork, z
                check fails with 0 ha, run R with a UTF-8 locale.
 To reproduce:  open code/group5_kpis.Rmd and click Knit, or run from the code/ folder:
                  Rscript -e 'rmarkdown::render("group5_kpis.Rmd", output_dir = "../output")'
-               Run time: about 2 minutes (plus first downloads: the two large Amazon Mining Watch files and, if
+               Run time: about 2 to 4 minutes (plus first downloads: the two large Amazon Mining Watch files and, if
                missing, the regional files in data_raw/regional/, about 4 minutes because UN Comtrade limits the call rate).
-               The notebook stops with "check failed" if any number differs from the publisher's (23 checks,
+               The notebook stops with "check failed" if any number differs from the publisher's (26 checks,
                including checks that detect a changed Amazon Mining Watch file).
 Output:        output/group5_kpis.html            the full notebook: every table, figure and number, with the code
+               (code/group5_kpis.html is the same file, kept next to the Rmd)
                output/fig_main.png                the figure in the brief
                output/table8_kpi_summary.csv      the five indicators: value today, source, delay, red line, action, limits
                output/table6_red_lines.csv        the red line of each indicator and why
@@ -47,6 +48,12 @@ Presentation:  presentation/group5_presentation.html   the 10 minute deck (one f
                The charts in the deck are the PNG figures in output/, made by code/group5_kpis.Rmd.
                Live version: https://santiagosierraiba.github.io/fzs-gold-mining-kpis/
 
+Brief:         Brief/Group_5_DFG_Brief.pdf               the two page brief (page 3: references and appendix)
+               Brief/Group_5_DFG_Brief.tex               its LaTeX source
+Dashboard:     dashboard.html                          an interactive page with the five indicators; it reads this
+                                                     repository on GitHub when it opens (or a built in copy)
+               index.html                              opens the presentation on the live version
+
 Folder structure (what goes in the zip)
   README.txt
   DOWNLOAD_LOG.csv
@@ -54,4 +61,6 @@ Folder structure (what goes in the zip)
   code/group5_kpis.Rmd
   output/
   presentation/
+  Brief/
+  dashboard.html, index.html
 Do not include: .git/, .Rproj.user/, .RData, .Rhistory (RStudio and git private files). group5_replication.Rproj is optional.
