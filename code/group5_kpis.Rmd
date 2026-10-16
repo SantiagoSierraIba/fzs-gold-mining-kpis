@@ -72,10 +72,10 @@ col_main <- "#234A76"; col_alert <- "#C0392B"; col_soft <- "#F28E2B"; col_grey <
 # Our answer
 
 FZS (Frankfurt Zoological Society) reports to donors and governments on
-illegal gold mining around its protected areas in Peru. Today it learns
-about new mining mainly from yearly satellite maps, and these maps arrive
-more than a year late. Our question was: **which numbers should FZS
-check every year, so it can see trouble earlier and act?**
+illegal gold mining around its protected areas in Peru. The yearly
+satellite maps of mining area, the main public source, arrive 5 to 17
+months after the year ends. Our question was: **which numbers should FZS
+check every year to see changes earlier and know where they happen?**
 
 We recommend **five indicators**. They work at three speeds:
 
@@ -92,8 +92,8 @@ We recommend **five indicators**. They work at three speeds:
 | 4 | Forest turned into mining: inside reserves and buffer zones, and in all of Madre de Dios | Late | Yearly | MapBiomas Peru |
 | 5 | New mining outside Madre de Dios (is mining spreading?) | Now | Quarterly | Amazon Mining Watch |
 
-Each indicator has **one red line** (a simple rule) and **one action**
-for FZS. Section 6 explains how we chose each red line and whether it
+Each indicator has **one red line** (a simple rule) and one suggested
+action. Section 6 explains how we chose each red line and whether it
 would have warned FZS in time before the 2021 to 2023 mining surge.
 
 We also checked many other signals: gold and mercury trade, coca,
@@ -108,15 +108,16 @@ FZS (Section 9).
 
 # How we worked
 
-1. **We started from FZS's problem.** The yearly maps are good but
-   late. So we looked for numbers that move earlier, and for numbers
-   that say *where* the mining is.
+1. **We started from the timing problem.** The yearly maps are
+   reliable but arrive 5 to 17 months late. So we looked for numbers
+   that move earlier, and for numbers that say *where* the mining is.
 2. **We described Madre de Dios first** (Section 4). The maps give a
    *stock* (all mining land in a year). The stock rarely goes down, so
    we used *flows*: land that became mining each year, and where it came
    from.
-3. **We found a trap.** Much of the big 2023 jump was water (old
-   flooded pits and rivers) relabelled as mining, not new forest loss.
+3. **We checked where new mining land came from.** Much of the 2023
+   jump was land the maps had called water the year before, likely old
+   flooded pits relabelled, not new forest loss.
    So our yearly indicator counts only **forest that became mining**.
 4. **We looked for early signals.** Miners respond to the gold price.
    And gold that is exported but never declared as produced shows how
@@ -128,8 +129,8 @@ FZS (Section 9).
    Dios.
 7. **We set one red line for each indicator and tested it on the past.**
    We chose the rules after we saw the data, so the test shows what
-   *would* have happened. It is not proof. The fair test is the next two
-   years.
+   *would* have happened. It is not proof. The next two years are the
+   real test.
 8. **We kept the other signals as context.** We say why each one is not
    a main indicator.
 
@@ -523,20 +524,20 @@ in). In 2022 it was `r fmt(f(2022,"from_water"))` ha, and in 2024
 slowly: `r fmt(f(2021,"from_forest"))`, `r fmt(f(2022,"from_forest"))`
 and `r fmt(f(2023,"from_forest"))` ha in 2021, 2022 and 2023.
 
-**Why would water become mining?** Old mining pits fill with water and
-the map then calls them water. If miners come back, or if the map
-changes its mind, the same land is called mining again. Mining can also
-move into river channels. The map cannot tell these stories apart
-**[Interpretation, not tested]**. We think the way the map is made
-explains a large part of it, for two reasons. First, studies in Madre de
+**Why water can become mining.** Old mining pits fill with water and
+the map labels them water. If mining resumes, or if the classifier reads
+the same pixel differently the next year, the land is labelled mining
+again. Mining can also move into river channels. The map cannot separate
+these cases **[Interpretation, not tested]**. The way the map is made
+probably explains a large part of it, for two reasons. First, studies in Madre de
 Dios show that satellite methods find mining ponds hard to classify: the
 water in active ponds is muddy, and ponds change colour as they age
 (Caballero Espejo et al. 2018; Camalan et al. 2022). Second, water to
 mining also jumped in the rest of Peru in 2023 (Section 10), and miners
-going back to old pits in Madre de Dios cannot explain that. **So what
-did we decide?** Our yearly indicator (KPI 4) counts only **forest that
-became mining**, not the net addition. Trees turning into bare ground
-are much easier to see from space than a pond turning into mining.
+going back to old pits in Madre de Dios cannot explain that.
+**Decision.** Our yearly indicator (KPI 4) counts only **forest that
+became mining**, not the net addition. Forest turning into bare ground
+is easier to detect from space than a pond turning into mining.
 
 ```{r fig-flows, fig.height = 4.5}
 flows %>% filter(year >= 2010) %>%
@@ -619,8 +620,8 @@ ggsave(file.path(OUT, "fig_left_mining.png"), width = 9, height = 3.8, dpi = 200
 `r round(lt("Water (flooded pits, rivers)"))`% water. These are
 different stories on the ground: an old mine growing back as young,
 poor forest; people farming old mining land; a river covering a mined
-bank; a pit filling with water. Some changes are also the map changing
-its mind about pixels at the edges. So "left mining" does **not** mean
+bank; a pit filling with water. Some changes are also the classifier
+labelling edge pixels differently from one year to the next. So "left mining" does **not** mean
 the damage was repaired. The water line also shows the back and forth
 behind the 2023 jump: `r fmt(m2w_2122)` ha of mining land was labelled
 water in 2021 and 2022, and `r fmt(f(2023, "from_water"))` ha of water
@@ -653,8 +654,8 @@ years the MapBiomas net addition jumped. The reason is what each one
 counts. Amazon Mining Watch counts a piece of land only **the first
 time** it is seen as mining. Mining again in an old pit, or a flooded pit
 that is mapped as mining again, is not new for Amazon Mining Watch, but
-it is new for the MapBiomas stock. **This supports our reading of 2023:
-much of the surge happened on land that was already mined before.** It
+it is new for the MapBiomas stock. This supports our reading of 2023:
+much of the surge happened on land that was already mined before. It
 also tells us how to use Amazon Mining Watch: it is good at showing
 mining that reaches **new places**, not at measuring the total amount of
 mining.
@@ -664,7 +665,7 @@ years, gives `r fmt(cum_forest_to_mining)` ha of forest turned into
 mining in Madre de Dios since 1985. MAAP reports
 `r fmt(pub("maap233_mdd"))` ha of mining deforestation up to mid 2025
 (MAAP #233). MAAP joins several methods and image sources, so the two
-numbers differ for good reasons.
+numbers are not directly comparable.
 
 ## Buffer zones compared with the rest of Madre de Dios
 
@@ -721,7 +722,7 @@ the department they rose from
 start the second period in 2021 because our card defines the surge as
 2021 to 2023, and because 2021 is the first year when forest turned into
 mining crossed its red line (KPI 4). The rest of the department faces
-the same gold price, roads and weather, so it is a fair comparison. It
+the same gold price, roads and weather, so it is a reasonable comparison. It
 is **not** a control group: the buffer zones were drawn around areas
 already under pressure, and mining can move between the two groups.
 
@@ -838,7 +839,7 @@ seasons): the gap = (exports minus declared production) as a share of
 exports.
 
 **Red line: the gap jumps.** The gap has been high since 2017, so a
-fixed level would be red every year and tell FZS nothing new. Instead,
+fixed level would be red every year and carry no new information. Instead,
 the red line is a **jump**: the 12 month gap is more than *X* points
 higher than one year earlier. We set *X* the same way as our other
 statistical red lines: the average yearly change in calm years (2014 to
@@ -937,9 +938,8 @@ choice, the red line would move.
 
 ## KPI 3 (now, quarterly): new mining in FZS landscapes
 
-**Why.** FZS needs to know **where** mining is happening, and fast.
-Amazon Mining Watch updates its data within days after each quarter
-ends. We count new mining in hectares (from the scar map) and in patches
+**Why.** This KPI shows **where** new mining appears. Amazon Mining
+Watch updates its data within days after each quarter ends. We count new mining in hectares (from the scar map) and in patches
 (from the detections), in four FZS landscapes in Madre de Dios:
 
 - inside the **Tambopata National Reserve**, where mining is always
@@ -1071,15 +1071,15 @@ communities (`r pct(yv("Native communities (all)", "change"))`), so
 all three are red. In the rest of Madre de Dios the change was
 `r pct(yv("Rest of Madre de Dios", "change"))`.
 
-**Is it real?** For 2025, yes, as far as we can check: Amazon Mining
+**Independent checks.** For 2025 the figure is supported: Amazon Mining
 Watch gives `r fmt(res25)` ha inside the reserve, and MAAP #241 (Amazon
-Conservation, 12 May 2026), using very sharp 0.5 m images, reports more
+Conservation, 12 May 2026), using 0.5 m images, reports more
 than `r pub("maap241_2025")` ha of mining deforestation inside the
 reserve in 2025, with `r pub("maap241_struct")` mining structures and
 `r pub("maap241_camps")` camps by February 2026. This is an independent
 source.
 
-**For 2026, the evidence is good but less direct.**
+**For 2026:**
 
 - Amazon Mining Watch's own newsletter reports
   `r pub("amw_panorama_h1")` ha of new mining in the reserve in the
@@ -1093,27 +1093,26 @@ source.
   Amazon Mining Watch gives
   `r fmt(sum(reserve_q$ha[reserve_q$period %in% c("2025 Q4", "2026 Q1", "2026 Q2")]))`
   ha for the same nine months. The two measure slightly different
-  things, but they agree on the size. **So the 2026 Q2 jump is supported
-  by an independent source.**
+  things, but they agree on the size. The 2026 Q2 increase is therefore
+  supported by an independent source.
 - For 2026 Q3 the picture is unclear. SERNANP's radar system (RAMI)
   found only `r pub("rami_tamb_julaug")` ha of forest lost inside the
   reserve in July and August 2026 (same article), while Amazon Mining
   Watch shows `r fmt(reserve_q$ha[reserve_q$period == "2026 Q3"])` ha in
   Q3. RAMI counts only forest that is lost, while Amazon Mining Watch
   counts any land seen as mining for the first time (also river banks
-  and land cleared before), so the two can differ. FZS should treat
-  2026 Q3 as provisional.
+  and land cleared before), so the two can differ. 2026 Q3 should be
+  treated as provisional.
 
 **A note on hectares and patches.** A patch counts each 480 m square
 once, however little of it is mined. Hectares measure the mined area.
 Both tell the same story here, and the reserve red line is first crossed
 in the same quarter with both. We use hectares as the main number because
-they can be compared with MAAP and MapBiomas. Pietro's separate
-calculation from the same scar map (pipeline by Pietro Maran) gives the
-same hectares. This is a check of our code, not an independent check of
+they can be compared with MAAP and MapBiomas. A separate calculation by
+Pietro Maran from the same scar map gives the same hectares. This is a check of our code, not an independent check of
 the satellite data.
 
-**How much of it has a mining title?** We use Likitha's four groups,
+**Mining titles.** We use Likitha Yenuga's four groups,
 with the official map of mining concessions (titled or in process):
 protected area; buffer zone with no mining title; elsewhere with no
 mining title; inside a mining concession. The first three are
@@ -1137,7 +1136,7 @@ log_number("k3_notitle_2026", "Share of new mining hectares in Madre de Dios wit
 **[Description]** In 2019 to 2024, about
 `r round(mean(sapply(as.character(2019:2024), noti)))`% of new mining
 hectares in Madre de Dios had no mining title. In the first three
-quarters of 2026 it was `r round(noti("2026 Q1 to Q3"))`%. Two warnings:
+quarters of 2026 it was `r round(noti("2026 Q1 to Q3"))`%. Two limits:
 we use **today's** concession map for every year (a concession granted
 in 2024 makes 2019 mining on that land look titled), and "no title" is
 not proof that mining is illegal. Mining inside a concession is not
@@ -1243,12 +1242,12 @@ ggsave(file.path(OUT, "fig_kpi3_quarters.png"), width = 9, height = 4.2, dpi = 2
 Watch counts land only the first time), dredges on rivers (the model
 ignores them), and legality. The quarters are provisional and can be
 revised. Amazon Mining Watch rebuilt its model in 2026 and replaces its
-files, so FZS cannot see what the data said in the past: it should save
-a copy every quarter.
+files, so earlier versions cannot be recovered. Saving a copy every
+quarter avoids this.
 
 ## KPI 4 (late, yearly): forest that became mining
 
-**Why.** This is the trusted yearly number for donors. It comes from
+**Why.** This is the reference yearly number for donor reports. It comes from
 MapBiomas Peru, which maps all of Peru every year since 1985. We count
 only **forest that became mining**, for the reason explained in Section
 4. We show two lines:
@@ -1315,7 +1314,7 @@ years since 2016: inside the reserves `r red_years("Inside the reserves")`;
 buffer zones `r red_years("Buffer zones")`; all of Madre de Dios
 `r red_years("All Madre de Dios")`.
 
-**An honest limit of the rule.** In all of Madre de Dios, 2025 was the
+**A limit of the rule.** In all of Madre de Dios, 2025 was the
 **highest year on record**
 (`r fmt(k4v("All Madre de Dios", 2025))` ha), but it is **not red**: the
 red line was `r fmt(k4v("All Madre de Dios", 2025, "limit"))` ha. The
@@ -1323,10 +1322,10 @@ reason is that the red line uses the previous five years, and those
 include the surge years 2021 to 2023. After a surge, the line moves up,
 so only a new and even bigger jump is red. We double checked this with a
 second, separate calculation (in Python, straight from the MapBiomas
-file) and got the same numbers. This is why we **lead with the reserves
-and buffer zones line**: it is where FZS acts, and it turned red. FZS
-should also report the plain number every year ("highest on record"),
-not only the colour.
+file) and got the same numbers. For this reason the **reserves and
+buffer zones line comes first**: it covers the areas where FZS works, and
+it is red. Donor reports can also state the plain number ("highest on
+record"), not only the colour.
 
 We report hectares, not the share of all new mining. During the surge
 the share inside FZS landscapes *fell* (the surge was mainly elsewhere
@@ -1343,8 +1342,8 @@ version (Section 10).
 
 ## KPI 5 (now, quarterly): is mining spreading outside Madre de Dios?
 
-**Why.** If FZS only watches Madre de Dios, it can miss a new mining
-front somewhere else in Peru. KPI 5 adds up new mining in **all of Peru
+**Why.** Watching only Madre de Dios can miss a new mining front
+elsewhere in Peru. KPI 5 adds up new mining in **all of Peru
 outside Madre de Dios**, from the same scar map as KPI 3.
 
 **Red line:** the same as for buffer zones in KPI 3: this year so far
@@ -1405,19 +1404,20 @@ ggsave(file.path(OUT, "fig_kpi5.png"), width = 9, height = 3.8, dpi = 200, bg = 
 Madre de Dios, but it is growing. Most of the growth is in **Huánuco**
 (`r fmt(k5v("2019", "Huánuco"))` ha in 2019,
 `r fmt(k5v("2025", "Huánuco"))` ha in 2025), around the El Sira buffer
-zone near Puerto Inca. Pietro found this first. Likitha found a break
-out in the El Sira buffer zone with the detections.
+zone near Puerto Inca. Pietro Maran first identified this increase;
+Likitha Yenuga found the same increase in the El Sira buffer zone using
+the detections.
 
 **Today KPI 5 is not red:** the first three quarters of 2026 had
 `r fmt(k5_26)` ha against `r fmt(k5_25)` ha a year earlier
 (`r pct(k5_change)`).
 
-**Be careful with the words.** In 2025,
+**Wording.** In 2025,
 `r round(k5_title$titled[k5_title$when == "2025"])`% of the new mining
 outside Madre de Dios was **inside a mining concession** (titled or in
 process). So this is "mining spreading", **not** "illegal mining
-spreading". FZS should watch it because a new front can grow fast, and
-because the El Sira buffer zone protects a reserve.
+spreading". It is still worth watching: a new front can grow fast, and
+the El Sira buffer zone protects a reserve.
 
 **What it does not show.** Same limits as KPI 3. Also, 2025 is the sum
 of four provisional quarters, which use a stricter rule than the
@@ -1430,8 +1430,8 @@ small parts of Amazonas, Cajamarca and Piura.
 
 **The rules.** We used two kinds of red line. For noisy numbers with a
 long history, a statistical rule: "above the recent average plus two
-standard deviations". For short or new series, a simple rule that a
-director can check by eye: "20% above", "25% more", "more than the worst
+standard deviations". For short or new series, a simple rule that is
+easy to check: "20% above", "25% more", "more than the worst
 year". The table shows each rule and why.
 
 ```{r thresholds}
@@ -1526,7 +1526,7 @@ was red from `r format(k1_first, "%B %Y")`, and KPI 2 from
    happened in 2021 to 2023. So the backtest shows what the rules
    *would* have done; it does not prove they work. The fair test is the
    next two years.
-2. **We use today's numbers with yesterday's dates.** We use Collection
+2. **Current values with past release dates.** We use Collection
    4 values with the release dates of earlier collections, because
    earlier Madre de Dios figures are not in a downloadable table. Each
    collection revises earlier years: for 2022, Collection 2 reported
@@ -1911,7 +1911,7 @@ so this is weak as a mining measure on its own.
 **Traffic at highway tolls.** Likitha studied traffic at the three toll
 stations on the Interoceanic Highway (OSITRAN data, separate file).
 Traffic grew much more at the toll next to the mining area than at the
-two other tolls. It is a good sign of activity on the mining road, but
+two other tolls. It is a useful sign of activity on the mining road, but
 there are only three tolls, one toll stopped counting vehicles for 16
 months after the 2023 protests, and we do not know what the trucks
 carry. So it is context, not a KPI.
@@ -2033,8 +2033,8 @@ prefer forest that became mining.
   illegality. Only mining inside a reserve is clearly illegal.
 - **Revisions and model changes.** Every MapBiomas collection revises
   earlier years, and Amazon Mining Watch rebuilt its model in 2026 and
-  replaces its files. FZS should save each version it uses and write
-  the version next to every number.
+  replaces its files. Each version used should be saved, with the
+  version written next to every number.
 - **Targets.** If an indicator becomes a target (for example, mining
   inside a reserve), miners and agencies may respond to the number
   rather than to the problem.
