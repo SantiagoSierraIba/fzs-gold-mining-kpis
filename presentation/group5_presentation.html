@@ -79,7 +79,7 @@ body.capture .sat img { transition: none; transform: none; }
 .speeds p { font-size: 27px; line-height: 1.3; margin-top: 14px; }
 .speeds .panel { display: flex; flex-direction: column; }
 .speeds .panel p { margin-bottom: 26px; }
-.speeds .speedkpi { font-family: var(--mono); font-size: 19px; color: var(--muted); margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+.speeds .speedkpi { font-family: var(--mono); font-size: 19px; line-height: 1.6; color: var(--muted); margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); min-height: 3.2em; }
 .speeds .panel h3 { min-height: 2em; }
 .tests { display: flex; flex-wrap: wrap; gap: 14px; }
 .tests span { font-size: 26px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; }
@@ -89,7 +89,8 @@ body.capture .sat img { transition: none; transform: none; }
 .rules .panel { display: flex; flex-direction: column; gap: 14px; }
 .rules .k { font-family: var(--mono); font-size: 19px; color: var(--gold); text-transform: uppercase; letter-spacing: .06em; }
 .rules h3 { font-family: var(--display); font-size: 46px; line-height: 1.05; margin: 0; font-weight: 800; min-height: 2.1em; }
-.rules p { font-size: 25px; line-height: 1.3; color: var(--muted); }
+.rules p { font-size: 25px; line-height: 1.3; color: var(--muted); margin-bottom: 12px; }
+.rules .rulekpi { font-family: var(--mono); font-size: 19px; line-height: 1.6; color: var(--muted); margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); min-height: 3.2em; }
 .lessons { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; font-size: 26px; line-height: 1.3; }
 
 /* kpi table */
@@ -247,9 +248,9 @@ body.capture .viewport { padding: 0; }
   <div class="eyebrow">How we chose the KPIs</div>
   <h2>Three speeds, five tests</h2>
   <div class="speeds">
-    <div class="panel"><div class="tag">Early</div><h3>Before new mining appears</h3><p>Gold price and gold trade. Pressure shows up months before the maps.</p><div class="speedkpi">KPI 1 and KPI 2 · monthly</div></div>
-    <div class="panel"><div class="tag">Now</div><h3>Where mining is happening</h3><p>Satellite detections, available days after each quarter ends.</p><div class="speedkpi">KPI 3 and KPI 5 · quarterly</div></div>
-    <div class="panel"><div class="tag">Late</div><h3>How much forest was lost</h3><p>The yearly maps. 5 to 17 months late, but the reference for donors.</p><div class="speedkpi">KPI 4 · yearly</div></div>
+    <div class="panel"><div class="tag">Early · monthly</div><h3>Before new mining appears</h3><p>Gold price and gold trade. Pressure shows up months before the maps.</p><div class="speedkpi">KPI 1 · gold price<br>KPI 2 · gold gap</div></div>
+    <div class="panel"><div class="tag">Now · quarterly</div><h3>Where mining is happening</h3><p>Satellite detections, available days after each quarter ends.</p><div class="speedkpi">KPI 3 · FZS landscapes<br>KPI 5 · outside Madre de Dios</div></div>
+    <div class="panel"><div class="tag">Late · yearly</div><h3>How much forest was lost</h3><p>The yearly maps. 5 to 17 months late, but the reference for donors.</p><div class="speedkpi">KPI 4 · forest lost</div></div>
   </div>
   <div class="eyebrow" style="margin-top:48px">Five tests for every KPI</div>
   <div class="tests"><span>Free and public</span><span>Arrives in time</span><span>Says where</span><span>Has a clear action</span><span>Honest about what it cannot see</span></div>
@@ -261,15 +262,11 @@ body.capture .viewport { padding: 0; }
   <div class="eyebrow">How we set the thresholds</div>
   <h2>One simple red line for each KPI</h2>
   <div class="rules">
-    <div class="panel"><div class="k">Rule 1</div><h3>Clearly above normal</h3><p>Gold price 20% above its average of the last 3 years.</p></div>
-    <div class="panel"><div class="k">Rule 2</div><h3>Average plus 2 standard deviations</h3><p>A year far above the last 5 years. Normal ups and downs stay below it.</p></div>
-    <div class="panel"><div class="k">Rule 3</div><h3>More than the same quarters last year</h3><p>More than 25% higher. In a reserve: one quarter worse than the worst whole year.</p></div>
+    <div class="panel"><div class="k">Rule 1</div><h3>Clearly above normal</h3><p>Gold price 20% above its average of the last 3 years.</p><div class="rulekpi">KPI 1 · gold price</div></div>
+    <div class="panel"><div class="k">Rule 2</div><h3>Average plus 2 standard deviations</h3><p>Far above its own past. Normal ups and downs stay below the line.</p><div class="rulekpi">KPI 2 · gold gap<br>KPI 4 · forest lost</div></div>
+    <div class="panel"><div class="k">Rule 3</div><h3>More than the same quarters last year</h3><p>More than 25% higher. In a reserve: one quarter worse than the worst whole year.</p><div class="rulekpi">KPI 3 · FZS landscapes<br>KPI 5 · outside Madre de Dios</div></div>
   </div>
-  <div class="lessons">
-    <p class="decision"><b>A line that is always red is useless.</b> "Any mining in a reserve" and "a high gold gap" were red every year, so we changed them.</p>
-    <p class="decision"><b>We set the lines after seeing the data.</b> The real test is 2026 and 2027.</p>
-  </div>
-  <div class="notes">We used only three kinds of rule, the same idea everywhere. Two lessons. A red line that is always red tells you nothing, so we changed two of them. And we were honest: we chose the lines after seeing the surge, so the next two years are the real test.</div>
+  <div class="notes">Each KPI has one simple red line. Three kinds of rule. The gold price: 20 percent above its average of the last three years. The gold gap and the yearly forest loss: far above their own past, with the average plus two standard deviations. The quarterly satellite numbers: much more than the same quarters last year, or inside a reserve, one quarter worse than the worst whole year.</div>
 </section>
 
 <!-- 7 -->
