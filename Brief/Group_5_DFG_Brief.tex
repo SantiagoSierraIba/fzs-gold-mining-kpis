@@ -32,19 +32,19 @@
 
 \begin{center}
 {\large\bfseries What should FZS track every year? Five indicators for illegal gold mining in Peru}\\[0.4ex]
-{\small Group 5 (Giant River Turtle): Likitha Yenuga, Laura Perez, Pietro Maran, Erion Vathi, Santiago Sierra\\
+{\small Group 5 (Giant River Turtle): Likitha Yenuga, Laura Pérez, Pietro Maran, Erion Vathi, Santiago Sierra\\
 Data for Good, Question 5 \,·\, October 2026 \,·\, Replication files: \url{https://github.com/SantiagoSierraIba/fzs-gold-mining-kpis}}
 \end{center}
 
 \section{The question}
 
-The Frankfurt Zoological Society (FZS) works to protect wilderness areas in the Peruvian Amazon, including the Tambopata National Reserve and its surroundings in Madre de Dios. Illegal gold mining is the main threat to these areas. FZS reports every year to donors and governments on whether the situation is getting better or worse. Today it learns about new mining mainly from yearly satellite maps, which are published 5 to 17 months after the year ends. During the 2021--2023 surge (annual additions of 4,940, 10,540 and 19,339~ha), the first map showing the surge appeared only in March 2023.
+The Frankfurt Zoological Society (FZS) works to protect wilderness areas in the Peruvian Amazon, including the Tambopata National Reserve and its surroundings in Madre de Dios. Illegal gold mining is one of the main threats to these areas. FZS reports every year to donors and governments on whether the situation is getting better or worse. The yearly satellite maps of mining area, the main public source, are published 5 to 17 months after the year ends (MapBiomas Peru, 2023--2026). During the 2021--2023 surge (annual additions of 4,940, 10,540 and 19,339~ha), the first of these maps, with data up to 2021, appeared only in March 2023 (Panamericana, 2023).
 
 We ask: \textbf{which small set of numbers should FZS check every year, so that it sees trouble earlier and knows where to act?} We study Madre de Dios, which holds 95\% of the mining area in Peru's Amazon (112,622~ha in 2025), from 2016 to the third quarter of 2026, and test each indicator on the 2021--2023 surge using only what was public at the time. We propose indicators at three speeds: \emph{early} (moves before mining appears on maps), \emph{now} (shows where mining is this quarter) and \emph{late} (slow but trusted, for donor reports). All claims below are descriptions or predictions; we make no causal claims.
 
 \section{Data and provenance}
 
-Every file is in \texttt{data\_raw/} as downloaded and listed in \texttt{DOWNLOAD\_LOG.csv}; the notebook stops if any of its 23 checks against the publisher fails.
+Every file is in \texttt{data\_raw/} as downloaded and listed in \texttt{DOWNLOAD\_LOG.csv}; the notebook stops if any of its 26 checks against the publisher fails.
 
 \vspace{-0.6ex}
 {\small
@@ -55,7 +55,7 @@ Dataset (publisher, version) & Check: our number = publisher's & Value \\
 Land cover and transitions by department, buffer zone and protected area (MapBiomas Peru, Collection 4) & Madre de Dios, mining area, 2025 & 112,622 ha \\
 Monthly commodity prices (World Bank Pink Sheet, Oct 2026) & Gold price, August 2026 & \$4,411/oz \\
 Exchange rate, prices, gold exports and production (BCRP) & Soles per US dollar, Sep 2026 & 3.38 \\
-New mining detections and scar map (Amazon Mining Watch, 3 Oct 2026) & Peru, patches first detected in 2024 & 2,072 \\
+New mining detections and scar map (Amazon Mining Watch, 3 Oct 2026) & Peru, mined area until 2026 Q2 (dashboard: 179.9k ha) & 179,874 ha \\
 Protected areas, buffer zones, native communities; mining concessions (SERNANP; INGEMMET); boundaries (GADM 4.1) & Used to place each detection; AMW Tambopata reserve total matches AMW's own table (within 1\%) & --- \\
 Published figures (MAAP \#233, \#241) & Typed by hand with report and date & --- \\
 \bottomrule
@@ -70,13 +70,13 @@ Published figures (MAAP \#233, \#241) & Typed by hand with report and date & ---
 \vspace{-4.5ex}
 \end{wrapfigure}
 
-\textbf{Main point.} \lab{Description} The early signals moved in 2020 and 2021; the yearly maps showed the surge only in March 2023 (figure). The gold price in soles rose above its red line in February 2020, public by March 2020. Peru's gold gap jumped in April 2021, public by June 2021. Forest turned into mining in Madre de Dios crossed its red line in 2021, 2022 and 2023, but the 2021 map was published on 3 March 2023. No single indicator is enough: the early ones say \emph{that} pressure is rising, not \emph{where}; the late ones say where, a year too late.
+\textbf{Main point.} \lab{Description} The early signals moved in 2020 and 2021; the yearly maps showed the surge only in March 2023 (figure). The gold price in soles rose above its red line in February 2020, public by March 2020. Peru's gold gap jumped in April 2021, public by June 2021. Forest turned into mining in Madre de Dios crossed its red line in 2021, 2022 and 2023, but the 2021 map was published on 3 March 2023. No single indicator is enough: the early ones say \emph{that} pressure is rising, not \emph{where}; the late ones say how much, 5 to 17 months later.
 
-\textbf{A trap in the yearly data.} \lab{Description} The 2023 jump was inflated: 39\% of the land that became ``mining'' that year had been water the year before (9,616~ha), mostly flooded old pits relabelled. So our yearly indicator counts only \emph{forest} that became mining. On that measure 2025 is the record year (10,308~ha).
+\textbf{A trap in the yearly data.} \lab{Description} The 2023 jump was inflated: 39\% of the land that became ``mining'' that year had been water the year before (9,616~ha). These are likely flooded old pits that the map labelled again: mining ponds are hard to classify from space (Caballero Espejo et al., 2018; Camalan et al., 2022), and the same jump appears in the rest of Peru. So our yearly indicator counts only \emph{forest} that became mining. On that measure 2025 is the record year (10,308~ha).
 
 \textbf{Where mining is now.} \lab{Description} Inside the Tambopata National Reserve, Amazon Mining Watch shows 966~ha of new mining in the first three quarters of 2026, against 194~ha a year earlier (164 detections against 19). MAAP \#241 independently reports more than 400~ha of mining deforestation inside the reserve in 2025. The share of new detections in reserves and buffer zones rose from 16\% in 2021--2023 to 40\% in 2026. \lab{Prediction} If this continues, the 2026 yearly map is likely to show the most forest lost to mining inside the reserve in our data.
 
-\textbf{Comparison.} \lab{Description} Mean yearly additions to the mining area in buffer zones rose from 1,468~ha (2016--2020) to 2,529~ha (2021--2025); in the rest of Madre de Dios from 2,405 to 8,044~ha. The surge was mostly outside the buffer zones; the move into protected land came after it.
+\textbf{Comparison.} \lab{Description} Mean yearly additions to the mining area in buffer zones rose from 1,468~ha (2016--2020) to 2,529~ha (2021--2025); in the rest of Madre de Dios from 2,405 to 8,044~ha. We start the second period in 2021, the first year forest turned into mining crossed its red line; the rest of the department faces the same gold price, roads and weather, but it is not a control group. The surge was mostly outside the buffer zones; the move into protected land came after it.
 
 \vspace{0.3ex}
 {\footnotesize
@@ -94,9 +94,9 @@ Indicator (speed, update) & Source & Today & Red when & Action when red \\
 
 \section{What FZS can do with this}
 
-\textbf{What FZS can learn.} Three of five indicators are red today, and the clearest signal is inside FZS's own landscape: new mining in the Tambopata reserve is five times last year's, and buffer zones and native communities are up 89--219\%. FZS can act on this now, with the quarterly locations, rather than wait for the 2026 map in late 2027. The gold price is high again (1.23), so pressure is likely to continue next dry season \lab{Prediction}.
+\textbf{What FZS can learn.} Three of five indicators are red today, and the clearest signal is inside FZS's own landscape: new mining in the Tambopata reserve is five times last year's, and buffer zones and native communities are up 89--219\%. FZS can act on this now, with the quarterly locations, rather than wait for the 2026 map in 2027. The gold price is high again (1.23), so pressure is likely to continue next dry season \lab{Prediction}.
 
-\textbf{Why it could mislead.} \emph{Selection and hindsight:} we chose the red lines after seeing the surge, so the backtest shows what would have happened, not proof; the gold-gap rule also fired in 2017--2018 with no surge after it. \emph{Omitted variables:} COVID-19, Operation Mercurio (2019) and weaker enforcement happened at the same time as the price rise, so we cannot say the price caused the surge. \emph{Reverse causation:} more mining also raises exports, so the gold gap partly reflects mining rather than predicting it. \emph{Measurement error:} each MapBiomas collection revises the past (Madre de Dios 2022: about 82,900~ha in Collection 2, 74,966~ha in Collection 4, $-$10\%); the newest year is the least corrected; Amazon Mining Watch rebuilt its model in 2026 and its quarterly data are provisional; the 2023 water relabelling may be a method change, since it also appears in the rest of Peru. \emph{What the data cannot see:} dredges on rivers (MAAP \#233 counts mining in 225 water bodies and 989 dredges in Loreto since 2017), mercury in water, fish and people, and legality, since only mining inside a reserve is clearly illegal.
+\textbf{Why it could mislead.} \emph{Selection and hindsight:} we chose the red lines after seeing the surge, so the backtest shows what would have happened, not proof; the gold-gap rule also fired in 2017--2018 with no surge after it. \emph{Omitted variables:} COVID-19, Operation Mercurio (2019) and weaker enforcement happened at the same time as the price rise, so we cannot say the price caused the surge. \emph{Reverse causation:} more mining also raises exports, so the gold gap partly reflects mining rather than predicting it. \emph{Measurement error:} each MapBiomas collection revises the past (Madre de Dios 2022: about 82,900~ha in Collection 2, 74,966~ha in Collection 4, $-$10\%); the newest year is the least corrected; Amazon Mining Watch rebuilt its model in 2026 and its quarterly data are provisional; the 2023 water relabelling may be a method change, since it also appears in the rest of Peru. \emph{What the data cannot see:} dredges on rivers (MAAP \#233, introduction, counts mining in 225 water bodies and 989 dredges in Loreto since 2017), mercury in water, fish and people, and legality, since only mining inside a reserve is clearly illegal.
 
 \textbf{What would let us say more.} Two more years of data, to test the red lines fairly on 2026--2027. Dated archives of each MapBiomas and Amazon Mining Watch version, so FZS reports every number with its version. Ground checks of the quarterly detections inside the reserve. River monitoring (dredge counts, mercury sampling) to cover what land maps miss. To estimate effects rather than describe them, a comparison of similar areas with and without enforcement, before and after it starts.
 
@@ -108,12 +108,17 @@ Indicator (speed, update) & Source & Today & Red when & Action when red \\
 \item MapBiomas Peru (2026). Collection 4 of land cover and use, statistics: \emph{Límites políticos}, \emph{Zona de amortiguamiento}, \emph{Áreas naturales protegidas} (COVERAGE\_4, TRANSITION\_4). \url{https://peru.mapbiomas.org/descargas/estadisticas/}. Accessed 11--15 Oct 2026.
 \item World Bank (2026). Commodity Price Data (Pink Sheet), monthly, updated 2 Oct 2026. \url{https://www.worldbank.org/en/research/commodity-markets}. Accessed Oct 2026.
 \item Banco Central de Reserva del Perú (2026). BCRPData series PN01234PM, PN38705PM, PN38792BM, RD12978DM. \url{https://estadisticas.bcrp.gob.pe}. Accessed Oct 2026.
-\item Earth Genome and Amazon Conservation (2026). Amazon Mining Watch: \nolinkurl{amazon_basin_detections.geojson}, \nolinkurl{amazon_basin_mining_scar_masks.tif}, README of 3 Oct 2026. \url{https://source.coop/earthgenome/amazon-mining-watch}. CC BY 4.0. Accessed Oct 2026.
+\item Earth Genome and Amazon Conservation (2026). Amazon Mining Watch: \nolinkurl{amazon_basin_detections.geojson}, \nolinkurl{amazon_basin_mining_scar_masks.tif}, README of 3 Oct 2026; dashboard \url{https://amazonminingwatch.org} (Peru, read 15 Oct 2026). \url{https://source.coop/earthgenome/amazon-mining-watch}. CC BY 4.0. Accessed Oct 2026.
 \item SERNANP (2026). Protected areas, buffer zones, native communities and INGEMMET mining concessions (download service). \url{https://geoservicios.sernanp.gob.pe}. Accessed Oct 2026.
-\item GADM (2022). Version 4.1, Peru level 1. \url{https://gadm.org}.
-\item MAAP \#233 (29 Sep 2025). Current situation of gold mining in the Peruvian Amazon. Amazon Conservation. \url{https://www.maapprogram.org/gold-mining-peru-amazon/}.
-\item MAAP \#241 (12 May 2026). Illegal mining is once again pushing deeper into one of Peru's most iconic protected areas. Amazon Conservation.
-\item MapBiomas Peru (5 Feb 2024). Collection 2 release (Madre de Dios mining area, 2022).
+\item GADM (2022). Version 4.1, Peru level 1. \url{https://gadm.org}. Accessed 11 Oct 2026.
+\item MAAP \#233 (29 Sep 2025). Current situation of gold mining in the Peruvian Amazon. Amazon Conservation. Introduction. \url{https://www.maapprogram.org/gold-mining-peru-amazon/}. Accessed 12 Oct 2026.
+\item MAAP \#241 (12 May 2026). Illegal mining is once again pushing deeper into one of Peru's most iconic protected areas. Amazon Conservation. \url{https://www.amazonconservation.org/illegal-mining-is-once-again-pushing-deeper-into-one-of-perus-most-iconic-protected-areas/}. Accessed 12 Oct 2026.
+\item MapBiomas Peru (5 Feb 2024). Alertan sobre pérdida de glaciares y vegetación natural en Perú (Collection 2, presented 15 Feb 2024; Madre de Dios mining area, 2022). \url{https://peru.mapbiomas.org/2024/02/05/alertan-sobre-perdida-de-glaciares-y-vegetacion-natural-en-peru/}. Accessed 13 Oct 2026.
+\item MapBiomas Peru (2025). Colección 3: ``El 5 de junio de 2025 se presentó la Colección 3''. \url{https://old-peru.mapbiomas.org/en/?p=138}. Accessed 16 Oct 2026.
+\item Panamericana (3 Mar 2023). En 37 años, Perú perdió 49.9\% de sus glaciares y 3.9\% de su vegetación natural (MapBiomas Peru Collection 1). \url{https://panamericana.pe/nacionales/374521-37-anos-peru-perdio-49-9-glaciares-3-9-vegetacion-natural}. Accessed 13 Oct 2026.
+\item Caretas (20 Aug 2026). Perú perdió 3,7 millones de hectáreas de vegetación natural en 41 años (MapBiomas Peru Collection 4). \url{https://caretas.pe/?p=828926}. Accessed 13 Oct 2026.
+\item Caballero Espejo, J., Messinger, M., Román-Dañobeytia, F., Ascorra, C., Fernandez, L. E. and Silman, M. (2018). Deforestation and forest degradation due to gold mining in the Peruvian Amazon: a 34-year perspective. \emph{Remote Sensing}, 10, 1903, Section 2 and Figure S1. \url{https://doi.org/10.3390/rs10121903}. Course reading, accessed Oct 2026.
+\item Camalan, S., Cui, K., Pauca, V. P., Alqahtani, S., Silman, M., Chan, R., Plemmons, R. J., Dethier, E. N., Fernandez, L. E. and Lutz, D. A. (2022). Change detection of Amazonian alluvial gold mining using deep learning and Sentinel-2 imagery. \emph{Remote Sensing}, 14, 1746, Section 1 and Figure 1. \url{https://doi.org/10.3390/rs14071746}. Course reading, accessed Oct 2026.
 \end{itemize}}
 
 \section*{Appendix A: Data log}
